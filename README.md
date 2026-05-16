@@ -59,7 +59,7 @@ Aplikasi menyediakan tampilan rekomendasi makanan selama tujuh hari. Setiap hari
 
 ### Meal Detail
 
-Setiap makanan memiliki detail seperti:
+Setiap makanan memiliki detail berupa:
 
 - Nama makanan.
 - Jenis makanan.
