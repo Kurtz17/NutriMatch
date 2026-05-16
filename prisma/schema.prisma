@@ -1,0 +1,154 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum ActivityLevel {
+  SEDENTARY         // Tidak aktif, BMR x 1.2
+  LIGHTLY_ACTIVE    // Olahraga ringan 1-3x/minggu, BMR x 1.375
+  MODERATELY_ACTIVE // Olahraga sedang 3-5x/minggu, BMR x 1.55
+  VERY_ACTIVE       // Olahraga berat 6-7x/minggu, BMR x 1.725
+}
+
+enum HealthGoal {
+  LOSE_WEIGHT     // Defisit kalori ~500 kcal/hari
+  MAINTAIN_WEIGHT // Sesuai TDEE
+  GAIN_WEIGHT     // Surplus kalori ~300 kcal/hari
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  profile   UserProfile?
+  mealPlans MealPlan[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  age           Int
+  weightKg      Float         @map("weight_kg")
+  heightCm      Float         @map("height_cm")
+  gender        Gender
+  activityLevel ActivityLevel @map("activity_level")
+  healthGoal    HealthGoal    @map("health_goal")
+
+  bmr            Float?
+  tdee           Float?
+  targetCalories Float? @map("target_calories")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  allergies UserAllergy[]
+
+  @@map("user_profiles")
+}
+
+model Allergen {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  userAllergies UserAllergy[]
+  foodAllergens FoodAllergen[]
+
+  @@map("allergens")
+}
+
+model UserAllergy {
+  id         String      @id @default(cuid())
+  profileId  String      @map("profile_id")
+  profile    UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  allergenId String      @map("allergen_id")
+  allergen   Allergen    @relation(fields: [allergenId], references: [id])
+
+  @@unique([profileId, allergenId])
+  @@map("user_allergies")
+}
+
+model Food {
+  id       String  @id @default(cuid())
+  name     String
+  category String?
+
+  caloriesPer100g Float  @map("calories_per_100g")
+  proteinPer100g  Float  @map("protein_per_100g")
+  carbsPer100g    Float  @map("carbs_per_100g")
+  fatPer100g      Float  @map("fat_per_100g")
+  fiberPer100g    Float? @map("fiber_per_100g")
+
+  allergens     FoodAllergen[]
+  mealPlanItems MealPlanItem[]
+
+  @@index([name])
+  @@map("foods")
+}
+
+model FoodAllergen {
+  id         String   @id @default(cuid())
+  foodId     String   @map("food_id")
+  food       Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  allergenId String   @map("allergen_id")
+  allergen   Allergen @relation(fields: [allergenId], references: [id])
+
+  @@unique([foodId, allergenId])
+  @@map("food_allergens")
+}
+
+model MealPlan {
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  startDate      DateTime @map("start_date")
+  endDate        DateTime @map("end_date")
+  targetCalories Float    @map("target_calories")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  items MealPlanItem[]
+
+  @@map("meal_plans")
+}
+
+model MealPlanItem {
+  id         String   @id @default(cuid())
+  mealPlanId String   @map("meal_plan_id")
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  foodId     String   @map("food_id")
+  food       Food     @relation(fields: [foodId], references: [id])
+
+  dayNumber Int      @map("day_number")
+  mealType  MealType @map("meal_type")
+  servingG  Float    @map("serving_g")
+
+  calories Float
+  proteinG Float @map("protein_g")
+  carbsG   Float @map("carbs_g")
+  fatG     Float @map("fat_g")
+
+  @@map("meal_plan_items")
+}
