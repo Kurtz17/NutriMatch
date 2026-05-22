@@ -21,6 +21,7 @@ export async function GET() {
     const profile = await prisma.userProfile.findUnique({
       where: { userId: user.id },
       include: {
+        user: true,
         allergies: {
           include: {
             allergen: true,
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
+      name,
       age,
       weightKg,
       heightCm,
@@ -119,6 +121,14 @@ export async function POST(request: NextRequest) {
     });
 
     const profile = await prisma.$transaction(async (tx) => {
+      
+      if (name) {
+        await tx.user.update({
+          where: { id: user.id },
+          data: { name: name },
+        });
+      }
+
       const savedProfile = await tx.userProfile.upsert({
         where: { userId: user.id },
         update: {
