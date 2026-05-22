@@ -1,0 +1,1143 @@
+{
+  "info": {
+    "_postman_id": "177f9d35-a211-4bd3-a01b-27da5c9c85ec",
+    "name": "NutriMatch API",
+    "description": "Dokumentasi lengkap REST API untuk backend NutriMatch.\n\n**Base URL:** `http://localhost:3000`\n\n**Cara Pakai:**\n\n1. Import file ini ke Postman\n    \n2. Set variable `baseUrl` di Collection Variables\n    \n3. Jalankan Register → Login → endpoint lainnya\n    \n4. Token sesi dikelola otomatis via cookie Supabase\n    \n\n**Urutan Test yang Disarankan:**\n\n1. Register\n    \n2. Login\n    \n3. Get Allergens\n    \n4. Save Profile (dengan allergenIds dari step 3)\n    \n5. Generate Meal Plan\n    \n6. Get Meal Plan\n    \n7. Get History\n    \n8. Swap Item",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "39625776",
+    "_collection_link": "https://go.postman.co/collection/39625776-177f9d35-a211-4bd3-a01b-27da5c9c85ec?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Budi Santoso\",\n  \"email\": \"budi@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Mendaftarkan user baru.\n\nAlur yang terjadi di backend:\n1. Validasi input (nama, email, password min 6 karakter)\n2. Daftarkan ke Supabase Auth via `supabase.auth.signUp()`\n3. Ambil ID yang dihasilkan Supabase\n4. Buat record di tabel `users` Prisma dengan ID yang sama\n\n**Catatan:** Pastikan Email Confirmation di Supabase dimatikan saat development (Authentication → Providers → Email → Confirm email → Off)"
+          },
+          "response": [
+            {
+              "name": "201 - Registrasi Berhasil",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Budi Santoso\",\n  \"email\": \"budi@example.com\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Mendaftarkan user baru.\n\nAlur yang terjadi di backend:\n1. Validasi input (nama, email, password min 6 karakter)\n2. Daftarkan ke Supabase Auth via `supabase.auth.signUp()`\n3. Ambil ID yang dihasilkan Supabase\n4. Buat record di tabel `users` Prisma dengan ID yang sama\n\n**Catatan:** Pastikan Email Confirmation di Supabase dimatikan saat development (Authentication → Providers → Email → Confirm email → Off)"
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Registrasi berhasil! Silakan cek email untuk verifikasi.\",\n  \"user\": {\n    \"id\": \"uuid-dari-supabase\",\n    \"email\": \"budi@example.com\",\n    \"name\": \"Budi Santoso\"\n  }\n}"
+            },
+            {
+              "name": "400 - Field Tidak Lengkap",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Budi Santoso\",\n  \"email\": \"budi@example.com\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Mendaftarkan user baru.\n\nAlur yang terjadi di backend:\n1. Validasi input (nama, email, password min 6 karakter)\n2. Daftarkan ke Supabase Auth via `supabase.auth.signUp()`\n3. Ambil ID yang dihasilkan Supabase\n4. Buat record di tabel `users` Prisma dengan ID yang sama\n\n**Catatan:** Pastikan Email Confirmation di Supabase dimatikan saat development (Authentication → Providers → Email → Confirm email → Off)"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Email, password, dan nama wajib diisi\"\n}"
+            },
+            {
+              "name": "400 - Email Sudah Terdaftar",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Budi Santoso\",\n  \"email\": \"budi@example.com\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Mendaftarkan user baru.\n\nAlur yang terjadi di backend:\n1. Validasi input (nama, email, password min 6 karakter)\n2. Daftarkan ke Supabase Auth via `supabase.auth.signUp()`\n3. Ambil ID yang dihasilkan Supabase\n4. Buat record di tabel `users` Prisma dengan ID yang sama\n\n**Catatan:** Pastikan Email Confirmation di Supabase dimatikan saat development (Authentication → Providers → Email → Confirm email → Off)"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"User already registered\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"budi@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login user yang sudah terdaftar.\n\nAlur yang terjadi di backend:\n1. Validasi input\n2. Panggil `supabase.auth.signInWithPassword()`\n3. Supabase otomatis set session cookie di browser\n4. Return data user\n\n**Penting:** Setelah login berhasil, Supabase menyimpan sesi di cookie. Semua request berikutnya otomatis terautentikasi selama cookie aktif — tidak perlu set header Authorization manual."
+          },
+          "response": [
+            {
+              "name": "200 - Login Berhasil",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"budi@example.com\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Login user yang sudah terdaftar.\n\nAlur yang terjadi di backend:\n1. Validasi input\n2. Panggil `supabase.auth.signInWithPassword()`\n3. Supabase otomatis set session cookie di browser\n4. Return data user\n\n**Penting:** Setelah login berhasil, Supabase menyimpan sesi di cookie. Semua request berikutnya otomatis terautentikasi selama cookie aktif — tidak perlu set header Authorization manual."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Login berhasil\",\n  \"user\": {\n    \"id\": \"uuid-dari-supabase\",\n    \"email\": \"budi@example.com\",\n    \"name\": \"Budi Santoso\"\n  }\n}"
+            },
+            {
+              "name": "401 - Kredensial Salah",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"budi@example.com\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Login user yang sudah terdaftar.\n\nAlur yang terjadi di backend:\n1. Validasi input\n2. Panggil `supabase.auth.signInWithPassword()`\n3. Supabase otomatis set session cookie di browser\n4. Return data user\n\n**Penting:** Setelah login berhasil, Supabase menyimpan sesi di cookie. Semua request berikutnya otomatis terautentikasi selama cookie aktif — tidak perlu set header Authorization manual."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Email atau password salah\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logout user yang sedang login.\n\nMenghapus session cookie Supabase sehingga semua request berikutnya akan ditolak dengan 401 Unauthorized oleh middleware."
+          },
+          "response": [
+            {
+              "name": "200 - Logout Berhasil",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "logout"
+                  ]
+                },
+                "description": "Logout user yang sedang login.\n\nMenghapus session cookie Supabase sehingga semua request berikutnya akan ditolak dengan 401 Unauthorized oleh middleware."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Logout berhasil\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Endpoint autentikasi — register, login, dan logout.\nSupabase mengelola session via cookie secara otomatis."
+    },
+    {
+      "name": "👤 Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profile"
+              ]
+            },
+            "description": "Ambil profil fisik user yang sedang login beserta daftar alerginya.\n\nDigunakan oleh frontend untuk:\n- Cek apakah user sudah mengisi profil (`hasProfile`)\n- Menampilkan data di halaman profile\n- Mengambil nilai BMR/TDEE yang sudah dihitung"
+          },
+          "response": [
+            {
+              "name": "200 - Profil Ditemukan",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "profile"
+                  ]
+                },
+                "description": "Ambil profil fisik user yang sedang login beserta daftar alerginya.\n\nDigunakan oleh frontend untuk:\n- Cek apakah user sudah mengisi profil (`hasProfile`)\n- Menampilkan data di halaman profile\n- Mengambil nilai BMR/TDEE yang sudah dihitung"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"hasProfile\": true,\n  \"profile\": {\n    \"id\": \"clxxxxx\",\n    \"userId\": \"uuid-supabase\",\n    \"age\": 22,\n    \"weightKg\": 65,\n    \"heightCm\": 170,\n    \"gender\": \"MALE\",\n    \"activityLevel\": \"LIGHTLY_ACTIVE\",\n    \"healthGoal\": \"LOSE_WEIGHT\",\n    \"bmr\": 1693,\n    \"tdee\": 2328,\n    \"targetCalories\": 1828,\n    \"updatedAt\": \"2026-05-16T10:00:00.000Z\",\n    \"allergies\": [\n      {\n        \"id\": \"clyyyyy\",\n        \"allergen\": {\n          \"id\": \"clzzzzz\",\n          \"name\": \"Seafood\",\n          \"slug\": \"seafood\"\n        }\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "404 - Profil Belum Diisi",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "profile"
+                  ]
+                },
+                "description": "Ambil profil fisik user yang sedang login beserta daftar alerginya.\n\nDigunakan oleh frontend untuk:\n- Cek apakah user sudah mengisi profil (`hasProfile`)\n- Menampilkan data di halaman profile\n- Mengambil nilai BMR/TDEE yang sudah dihitung"
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Profil belum diisi\",\n  \"hasProfile\": false\n}"
+            },
+            {
+              "name": "401 - Belum Login",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "profile"
+                  ]
+                },
+                "description": "Ambil profil fisik user yang sedang login beserta daftar alerginya.\n\nDigunakan oleh frontend untuk:\n- Cek apakah user sudah mengisi profil (`hasProfile`)\n- Menampilkan data di halaman profile\n- Mengambil nilai BMR/TDEE yang sudah dihitung"
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Unauthorized\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Save Profile (Create / Update)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 22,\n  \"weightKg\": 65,\n  \"heightCm\": 170,\n  \"gender\": \"MALE\",\n  \"activityLevel\": \"LIGHTLY_ACTIVE\",\n  \"healthGoal\": \"LOSE_WEIGHT\",\n  \"allergenIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profile"
+              ]
+            },
+            "description": "Buat atau update profil fisik user. Backend otomatis menghitung BMR, TDEE, dan target kalori.\n\n**Logika Kalkulasi (Mifflin-St Jeor):**\n- BMR Pria = (10 × berat) + (6.25 × tinggi) - (5 × usia) + 5\n- BMR Wanita = (10 × berat) + (6.25 × tinggi) - (5 × usia) - 161\n- TDEE = BMR × activity multiplier\n- Target = TDEE ± goal adjustment\n\n**Activity Multiplier:**\n- SEDENTARY → ×1.2\n- LIGHTLY_ACTIVE → ×1.375\n- MODERATELY_ACTIVE → ×1.55\n- VERY_ACTIVE → ×1.725\n\n**Goal Adjustment:**\n- LOSE_WEIGHT → -500 kcal\n- MAINTAIN_WEIGHT → ±0 kcal\n- GAIN_WEIGHT → +300 kcal\n\n**allergenIds:** Array of allergen ID dari endpoint GET /api/allergens. Kirim array kosong `[]` jika tidak punya alergi.\n\n**Catatan:** Endpoint ini pakai `upsert` — aman dipanggil berkali-kali, data lama akan di-overwrite."
+          },
+          "response": [
+            {
+              "name": "200 - Profil Berhasil Disimpan",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"age\": 22,\n  \"weightKg\": 65,\n  \"heightCm\": 170,\n  \"gender\": \"MALE\",\n  \"activityLevel\": \"LIGHTLY_ACTIVE\",\n  \"healthGoal\": \"LOSE_WEIGHT\",\n  \"allergenIds\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "profile"
+                  ]
+                },
+                "description": "Buat atau update profil fisik user. Backend otomatis menghitung BMR, TDEE, dan target kalori.\n\n**Logika Kalkulasi (Mifflin-St Jeor):**\n- BMR Pria = (10 × berat) + (6.25 × tinggi) - (5 × usia) + 5\n- BMR Wanita = (10 × berat) + (6.25 × tinggi) - (5 × usia) - 161\n- TDEE = BMR × activity multiplier\n- Target = TDEE ± goal adjustment\n\n**Activity Multiplier:**\n- SEDENTARY → ×1.2\n- LIGHTLY_ACTIVE → ×1.375\n- MODERATELY_ACTIVE → ×1.55\n- VERY_ACTIVE → ×1.725\n\n**Goal Adjustment:**\n- LOSE_WEIGHT → -500 kcal\n- MAINTAIN_WEIGHT → ±0 kcal\n- GAIN_WEIGHT → +300 kcal\n\n**allergenIds:** Array of allergen ID dari endpoint GET /api/allergens. Kirim array kosong `[]` jika tidak punya alergi.\n\n**Catatan:** Endpoint ini pakai `upsert` — aman dipanggil berkali-kali, data lama akan di-overwrite."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Profil berhasil disimpan\",\n  \"profile\": {\n    \"id\": \"clxxxxx\",\n    \"userId\": \"uuid-supabase\",\n    \"age\": 22,\n    \"weightKg\": 65,\n    \"heightCm\": 170,\n    \"gender\": \"MALE\",\n    \"activityLevel\": \"LIGHTLY_ACTIVE\",\n    \"healthGoal\": \"LOSE_WEIGHT\",\n    \"bmr\": 1693,\n    \"tdee\": 2328,\n    \"targetCalories\": 1828\n  }\n}"
+            },
+            {
+              "name": "400 - Field Tidak Lengkap",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"age\": 22,\n  \"weightKg\": 65,\n  \"heightCm\": 170,\n  \"gender\": \"MALE\",\n  \"activityLevel\": \"LIGHTLY_ACTIVE\",\n  \"healthGoal\": \"LOSE_WEIGHT\",\n  \"allergenIds\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "profile"
+                  ]
+                },
+                "description": "Buat atau update profil fisik user. Backend otomatis menghitung BMR, TDEE, dan target kalori.\n\n**Logika Kalkulasi (Mifflin-St Jeor):**\n- BMR Pria = (10 × berat) + (6.25 × tinggi) - (5 × usia) + 5\n- BMR Wanita = (10 × berat) + (6.25 × tinggi) - (5 × usia) - 161\n- TDEE = BMR × activity multiplier\n- Target = TDEE ± goal adjustment\n\n**Activity Multiplier:**\n- SEDENTARY → ×1.2\n- LIGHTLY_ACTIVE → ×1.375\n- MODERATELY_ACTIVE → ×1.55\n- VERY_ACTIVE → ×1.725\n\n**Goal Adjustment:**\n- LOSE_WEIGHT → -500 kcal\n- MAINTAIN_WEIGHT → ±0 kcal\n- GAIN_WEIGHT → +300 kcal\n\n**allergenIds:** Array of allergen ID dari endpoint GET /api/allergens. Kirim array kosong `[]` jika tidak punya alergi.\n\n**Catatan:** Endpoint ini pakai `upsert` — aman dipanggil berkali-kali, data lama akan di-overwrite."
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Field berikut wajib diisi: age, weightKg\"\n}"
+            },
+            {
+              "name": "400 - Enum Tidak Valid",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"age\": 22,\n  \"weightKg\": 65,\n  \"heightCm\": 170,\n  \"gender\": \"MALE\",\n  \"activityLevel\": \"LIGHTLY_ACTIVE\",\n  \"healthGoal\": \"LOSE_WEIGHT\",\n  \"allergenIds\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "profile"
+                  ]
+                },
+                "description": "Buat atau update profil fisik user. Backend otomatis menghitung BMR, TDEE, dan target kalori.\n\n**Logika Kalkulasi (Mifflin-St Jeor):**\n- BMR Pria = (10 × berat) + (6.25 × tinggi) - (5 × usia) + 5\n- BMR Wanita = (10 × berat) + (6.25 × tinggi) - (5 × usia) - 161\n- TDEE = BMR × activity multiplier\n- Target = TDEE ± goal adjustment\n\n**Activity Multiplier:**\n- SEDENTARY → ×1.2\n- LIGHTLY_ACTIVE → ×1.375\n- MODERATELY_ACTIVE → ×1.55\n- VERY_ACTIVE → ×1.725\n\n**Goal Adjustment:**\n- LOSE_WEIGHT → -500 kcal\n- MAINTAIN_WEIGHT → ±0 kcal\n- GAIN_WEIGHT → +300 kcal\n\n**allergenIds:** Array of allergen ID dari endpoint GET /api/allergens. Kirim array kosong `[]` jika tidak punya alergi.\n\n**Catatan:** Endpoint ini pakai `upsert` — aman dipanggil berkali-kali, data lama akan di-overwrite."
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Gender tidak valid. Gunakan: MALE atau FEMALE\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Endpoint untuk mengelola profil fisik user.\n\n⚠️ Semua endpoint di folder ini membutuhkan user yang sudah login."
+    },
+    {
+      "name": "🥜 Allergens",
+      "item": [
+        {
+          "name": "Get All Allergens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/allergens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "allergens"
+              ]
+            },
+            "description": "Ambil semua alergen yang tersedia untuk ditampilkan sebagai pilihan checkbox di form onboarding.\n\nData ini statis dari seed — tidak akan berubah kecuali seed dijalankan ulang.\n\n**Gunakan `id` dari response ini sebagai nilai `allergenIds` di POST /api/profile.**"
+          },
+          "response": [
+            {
+              "name": "200 - Daftar Allergen",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/allergens",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "allergens"
+                  ]
+                },
+                "description": "Ambil semua alergen yang tersedia untuk ditampilkan sebagai pilihan checkbox di form onboarding.\n\nData ini statis dari seed — tidak akan berubah kecuali seed dijalankan ulang.\n\n**Gunakan `id` dari response ini sebagai nilai `allergenIds` di POST /api/profile.**"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"allergens\": [\n    { \"id\": \"claaaaa\", \"name\": \"Dairy (Susu)\", \"slug\": \"dairy\" },\n    { \"id\": \"clbbbbb\", \"name\": \"Gluten\", \"slug\": \"gluten\" },\n    { \"id\": \"clccccc\", \"name\": \"Kacang\", \"slug\": \"kacang\" },\n    { \"id\": \"clddddd\", \"name\": \"Kedelai\", \"slug\": \"kedelai\" },\n    { \"id\": \"cleeee\",  \"name\": \"Seafood\", \"slug\": \"seafood\" },\n    { \"id\": \"clfffff\", \"name\": \"Telur\", \"slug\": \"telur\" }\n  ]\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Endpoint untuk mengambil master data alergen.\nPublic endpoint — tidak memerlukan login."
+    },
+    {
+      "name": "🍱 Meal Plan",
+      "item": [
+        {
+          "name": "Generate Meal Plan",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/meal-plan",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "meal-plan"
+              ]
+            },
+            "description": "Generate meal plan baru selama 7 hari.\n\n**Tidak memerlukan body** — semua data diambil otomatis dari profil user yang sudah tersimpan.\n\n**Algoritma Generator:**\n1. Ambil profil user dan daftar alerginya\n2. Query makanan yang AMAN (tidak mengandung alergen user)\n3. Distribusikan kalori: Sarapan 25% | Makan Siang 35% | Makan Malam 30% | Snack 10%\n4. Hitung porsi (gram) per makanan secara otomatis\n5. Simpan ke tabel `meal_plans` dan `meal_plan_items`\n\n**Prasyarat:**\n- User sudah login\n- Profil sudah diisi via POST /api/profile"
+          },
+          "response": [
+            {
+              "name": "201 - Meal Plan Berhasil Dibuat",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan"
+                  ]
+                },
+                "description": "Generate meal plan baru selama 7 hari.\n\n**Tidak memerlukan body** — semua data diambil otomatis dari profil user yang sudah tersimpan.\n\n**Algoritma Generator:**\n1. Ambil profil user dan daftar alerginya\n2. Query makanan yang AMAN (tidak mengandung alergen user)\n3. Distribusikan kalori: Sarapan 25% | Makan Siang 35% | Makan Malam 30% | Snack 10%\n4. Hitung porsi (gram) per makanan secara otomatis\n5. Simpan ke tabel `meal_plans` dan `meal_plan_items`\n\n**Prasyarat:**\n- User sudah login\n- Profil sudah diisi via POST /api/profile"
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Meal plan 7 hari berhasil dibuat!\",\n  \"mealPlanId\": \"clxxxxx\",\n  \"summary\": {\n    \"targetCaloriesPerDay\": 1828,\n    \"totalFoodsGenerated\": 28,\n    \"startDate\": \"2026-05-16\",\n    \"endDate\": \"2026-05-22\",\n    \"allergenFiltered\": 1\n  }\n}"
+            },
+            {
+              "name": "400 - Profil Belum Diisi",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan"
+                  ]
+                },
+                "description": "Generate meal plan baru selama 7 hari.\n\n**Tidak memerlukan body** — semua data diambil otomatis dari profil user yang sudah tersimpan.\n\n**Algoritma Generator:**\n1. Ambil profil user dan daftar alerginya\n2. Query makanan yang AMAN (tidak mengandung alergen user)\n3. Distribusikan kalori: Sarapan 25% | Makan Siang 35% | Makan Malam 30% | Snack 10%\n4. Hitung porsi (gram) per makanan secara otomatis\n5. Simpan ke tabel `meal_plans` dan `meal_plan_items`\n\n**Prasyarat:**\n- User sudah login\n- Profil sudah diisi via POST /api/profile"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Profil belum lengkap. Silakan isi data fisik terlebih dahulu.\"\n}"
+            },
+            {
+              "name": "400 - Makanan Tidak Cukup",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan"
+                  ]
+                },
+                "description": "Generate meal plan baru selama 7 hari.\n\n**Tidak memerlukan body** — semua data diambil otomatis dari profil user yang sudah tersimpan.\n\n**Algoritma Generator:**\n1. Ambil profil user dan daftar alerginya\n2. Query makanan yang AMAN (tidak mengandung alergen user)\n3. Distribusikan kalori: Sarapan 25% | Makan Siang 35% | Makan Malam 30% | Snack 10%\n4. Hitung porsi (gram) per makanan secara otomatis\n5. Simpan ke tabel `meal_plans` dan `meal_plan_items`\n\n**Prasyarat:**\n- User sudah login\n- Profil sudah diisi via POST /api/profile"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Tidak cukup makanan yang aman untuk membuat meal plan. Coba kurangi filter alergi.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Latest Meal Plan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();\r",
+                  "\r",
+                  "// Pastikan meal plan ada dan hari pertama memiliki data\r",
+                  "if (jsonData.hasMealPlan && jsonData.mealPlan.days.length > 0) {\r",
+                  "    // Ambil ID makanan pertama di hari pertama (misal: menu Breakfast)\r",
+                  "    var firstItemId = jsonData.mealPlan.days[0].meals.BREAKFAST[0].id;\r",
+                  "\r",
+                  "    // Simpan ID tersebut ke variabel 'mealPlanItemId' secara otomatis\r",
+                  "    pm.collectionVariables.set(\"mealPlanItemId\", firstItemId);\r",
+                  "\r",
+                  "    console.log(\"ID Makanan berhasil ditangkap: \" + firstItemId);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/meal-plan",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "meal-plan"
+              ]
+            },
+            "description": "Ambil meal plan terbaru milik user.\n\nResponse sudah diformat per hari dan per sesi makan untuk memudahkan render di frontend. Setiap hari juga menyertakan total kalori dan makronutrien.\n\n**Tip:** Simpan nilai `id` dari `days[].meals.BREAKFAST[].id` (atau sesi lainnya) sebagai `mealPlanItemId` di Collection Variables untuk dipakai di endpoint Swap Item."
+          },
+          "response": [
+            {
+              "name": "200 - Meal Plan Ditemukan",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan"
+                  ]
+                },
+                "description": "Ambil meal plan terbaru milik user.\n\nResponse sudah diformat per hari dan per sesi makan untuk memudahkan render di frontend. Setiap hari juga menyertakan total kalori dan makronutrien.\n\n**Tip:** Simpan nilai `id` dari `days[].meals.BREAKFAST[].id` (atau sesi lainnya) sebagai `mealPlanItemId` di Collection Variables untuk dipakai di endpoint Swap Item."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"hasMealPlan\": true,\n  \"mealPlan\": {\n    \"id\": \"clxxxxx\",\n    \"startDate\": \"2026-05-16T00:00:00.000Z\",\n    \"endDate\": \"2026-05-22T00:00:00.000Z\",\n    \"targetCalories\": 1828,\n    \"createdAt\": \"2026-05-16T10:00:00.000Z\",\n    \"days\": [\n      {\n        \"dayNumber\": 1,\n        \"totalCalories\": 1812,\n        \"totalProteinG\": 78.5,\n        \"totalCarbsG\": 210.3,\n        \"totalFatG\": 52.1,\n        \"meals\": {\n          \"BREAKFAST\": [\n            {\n              \"id\": \"clitemid1\",\n              \"dayNumber\": 1,\n              \"mealType\": \"BREAKFAST\",\n              \"servingG\": 250,\n              \"calories\": 457,\n              \"proteinG\": 6.8,\n              \"carbsG\": 70.5,\n              \"fatG\": 0.8,\n              \"food\": {\n                \"id\": \"clfoodid\",\n                \"name\": \"Nasi Putih\",\n                \"category\": \"Karbohidrat\"\n              }\n            }\n          ],\n          \"LUNCH\": [],\n          \"DINNER\": [],\n          \"SNACK\": []\n        }\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "404 - Belum Ada Meal Plan",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan"
+                  ]
+                },
+                "description": "Ambil meal plan terbaru milik user.\n\nResponse sudah diformat per hari dan per sesi makan untuk memudahkan render di frontend. Setiap hari juga menyertakan total kalori dan makronutrien.\n\n**Tip:** Simpan nilai `id` dari `days[].meals.BREAKFAST[].id` (atau sesi lainnya) sebagai `mealPlanItemId` di Collection Variables untuk dipakai di endpoint Swap Item."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Meal plan belum dibuat\",\n  \"hasMealPlan\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Meal Plan History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/meal-plan/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "meal-plan",
+                "history"
+              ]
+            },
+            "description": "Ambil seluruh riwayat meal plan user dari waktu ke waktu.\n\nResponse **ringan** — tidak menyertakan detail semua items, hanya summary per plan berupa rata-rata nutrisi harian. Cocok untuk halaman history atau grafik progres.\n\n`isLatest: true` menandai plan yang paling baru dibuat."
+          },
+          "response": [
+            {
+              "name": "200 - Riwayat Ditemukan",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan/history",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan",
+                    "history"
+                  ]
+                },
+                "description": "Ambil seluruh riwayat meal plan user dari waktu ke waktu.\n\nResponse **ringan** — tidak menyertakan detail semua items, hanya summary per plan berupa rata-rata nutrisi harian. Cocok untuk halaman history atau grafik progres.\n\n`isLatest: true` menandai plan yang paling baru dibuat."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"total\": 2,\n  \"history\": [\n    {\n      \"id\": \"clplanid2\",\n      \"label\": \"Meal Plan #2\",\n      \"startDate\": \"2026-05-16T00:00:00.000Z\",\n      \"endDate\": \"2026-05-22T00:00:00.000Z\",\n      \"targetCaloriesPerDay\": 1828,\n      \"createdAt\": \"2026-05-16T10:00:00.000Z\",\n      \"isLatest\": true,\n      \"summary\": {\n        \"totalDays\": 7,\n        \"avgDailyCalories\": 1815,\n        \"avgDailyProteinG\": 77.2,\n        \"avgDailyCarbsG\": 208.5,\n        \"avgDailyFatG\": 51.3\n      }\n    },\n    {\n      \"id\": \"clplanid1\",\n      \"label\": \"Meal Plan #1\",\n      \"startDate\": \"2026-05-09T00:00:00.000Z\",\n      \"endDate\": \"2026-05-15T00:00:00.000Z\",\n      \"targetCaloriesPerDay\": 1828,\n      \"createdAt\": \"2026-05-09T08:00:00.000Z\",\n      \"isLatest\": false,\n      \"summary\": {\n        \"totalDays\": 7,\n        \"avgDailyCalories\": 1820,\n        \"avgDailyProteinG\": 79.0,\n        \"avgDailyCarbsG\": 212.0,\n        \"avgDailyFatG\": 53.0\n      }\n    }\n  ]\n}"
+            },
+            {
+              "name": "200 - Belum Ada Riwayat",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan/history",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan",
+                    "history"
+                  ]
+                },
+                "description": "Ambil seluruh riwayat meal plan user dari waktu ke waktu.\n\nResponse **ringan** — tidak menyertakan detail semua items, hanya summary per plan berupa rata-rata nutrisi harian. Cocok untuk halaman history atau grafik progres.\n\n`isLatest: true` menandai plan yang paling baru dibuat."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"total\": 0,\n  \"history\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Swap Meal Plan Item",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/meal-plan/item/{{mealPlanItemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "meal-plan",
+                "item",
+                "{{mealPlanItemId}}"
+              ]
+            },
+            "description": "Tukar satu item makanan spesifik dengan alternatif yang setara.\n\n**Tidak memerlukan body** — backend menentukan pengganti secara otomatis.\n\n**Algoritma Pencarian Pengganti (2 lapis):**\n\n*Lapis 1 — Kategori Sama:*\n- Cari makanan di kategori yang sama (misal: Protein → Protein)\n- Kalori aktual harus dalam toleransi ±30%\n- Wajib aman dari semua alergen user\n\n*Lapis 2 — Fallback Semua Kategori:*\n- Kalau lapis 1 tidak ada kandidat\n- Cari di semua kategori dengan toleransi ±30%\n- Tetap wajib aman dari alergen user\n\n**Cara Mendapat `mealPlanItemId`:**\nCopy nilai `id` dari salah satu item di response `GET /api/meal-plan`, contoh: `days[0].meals.LUNCH[0].id`\n\nIsi variabel `mealPlanItemId` di Collection Variables, atau ganti langsung di URL."
+          },
+          "response": [
+            {
+              "name": "200 - Swap Berhasil",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan/item/{{mealPlanItemId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan",
+                    "item",
+                    "{{mealPlanItemId}}"
+                  ]
+                },
+                "description": "Tukar satu item makanan spesifik dengan alternatif yang setara.\n\n**Tidak memerlukan body** — backend menentukan pengganti secara otomatis.\n\n**Algoritma Pencarian Pengganti (2 lapis):**\n\n*Lapis 1 — Kategori Sama:*\n- Cari makanan di kategori yang sama (misal: Protein → Protein)\n- Kalori aktual harus dalam toleransi ±30%\n- Wajib aman dari semua alergen user\n\n*Lapis 2 — Fallback Semua Kategori:*\n- Kalau lapis 1 tidak ada kandidat\n- Cari di semua kategori dengan toleransi ±30%\n- Tetap wajib aman dari alergen user\n\n**Cara Mendapat `mealPlanItemId`:**\nCopy nilai `id` dari salah satu item di response `GET /api/meal-plan`, contoh: `days[0].meals.LUNCH[0].id`\n\nIsi variabel `mealPlanItemId` di Collection Variables, atau ganti langsung di URL."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Berhasil mengganti \\\"Ikan Goreng\\\" dengan \\\"Ayam Rebus\\\"\",\n  \"previousFood\": {\n    \"id\": \"clfoodold\",\n    \"name\": \"Ikan Goreng\",\n    \"calories\": 392\n  },\n  \"newItem\": {\n    \"id\": \"clitemid1\",\n    \"dayNumber\": 2,\n    \"mealType\": \"LUNCH\",\n    \"food\": {\n      \"id\": \"clfoodnew\",\n      \"name\": \"Ayam Rebus\",\n      \"category\": \"Protein\"\n    },\n    \"servingG\": 182,\n    \"calories\": 391,\n    \"proteinG\": 52.8,\n    \"carbsG\": 0.0,\n    \"fatG\": 20.0\n  }\n}"
+            },
+            {
+              "name": "404 - Item Tidak Ditemukan",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan/item/{{mealPlanItemId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan",
+                    "item",
+                    "{{mealPlanItemId}}"
+                  ]
+                },
+                "description": "Tukar satu item makanan spesifik dengan alternatif yang setara.\n\n**Tidak memerlukan body** — backend menentukan pengganti secara otomatis.\n\n**Algoritma Pencarian Pengganti (2 lapis):**\n\n*Lapis 1 — Kategori Sama:*\n- Cari makanan di kategori yang sama (misal: Protein → Protein)\n- Kalori aktual harus dalam toleransi ±30%\n- Wajib aman dari semua alergen user\n\n*Lapis 2 — Fallback Semua Kategori:*\n- Kalau lapis 1 tidak ada kandidat\n- Cari di semua kategori dengan toleransi ±30%\n- Tetap wajib aman dari alergen user\n\n**Cara Mendapat `mealPlanItemId`:**\nCopy nilai `id` dari salah satu item di response `GET /api/meal-plan`, contoh: `days[0].meals.LUNCH[0].id`\n\nIsi variabel `mealPlanItemId` di Collection Variables, atau ganti langsung di URL."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Item tidak ditemukan\"\n}"
+            },
+            {
+              "name": "404 - Tidak Ada Alternatif",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan/item/{{mealPlanItemId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan",
+                    "item",
+                    "{{mealPlanItemId}}"
+                  ]
+                },
+                "description": "Tukar satu item makanan spesifik dengan alternatif yang setara.\n\n**Tidak memerlukan body** — backend menentukan pengganti secara otomatis.\n\n**Algoritma Pencarian Pengganti (2 lapis):**\n\n*Lapis 1 — Kategori Sama:*\n- Cari makanan di kategori yang sama (misal: Protein → Protein)\n- Kalori aktual harus dalam toleransi ±30%\n- Wajib aman dari semua alergen user\n\n*Lapis 2 — Fallback Semua Kategori:*\n- Kalau lapis 1 tidak ada kandidat\n- Cari di semua kategori dengan toleransi ±30%\n- Tetap wajib aman dari alergen user\n\n**Cara Mendapat `mealPlanItemId`:**\nCopy nilai `id` dari salah satu item di response `GET /api/meal-plan`, contoh: `days[0].meals.LUNCH[0].id`\n\nIsi variabel `mealPlanItemId` di Collection Variables, atau ganti langsung di URL."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Tidak ada makanan pengganti yang tersedia dengan kalori setara dan aman dari alergi.\"\n}"
+            },
+            {
+              "name": "403 - Bukan Milik User",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/meal-plan/item/{{mealPlanItemId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "meal-plan",
+                    "item",
+                    "{{mealPlanItemId}}"
+                  ]
+                },
+                "description": "Tukar satu item makanan spesifik dengan alternatif yang setara.\n\n**Tidak memerlukan body** — backend menentukan pengganti secara otomatis.\n\n**Algoritma Pencarian Pengganti (2 lapis):**\n\n*Lapis 1 — Kategori Sama:*\n- Cari makanan di kategori yang sama (misal: Protein → Protein)\n- Kalori aktual harus dalam toleransi ±30%\n- Wajib aman dari semua alergen user\n\n*Lapis 2 — Fallback Semua Kategori:*\n- Kalau lapis 1 tidak ada kandidat\n- Cari di semua kategori dengan toleransi ±30%\n- Tetap wajib aman dari alergen user\n\n**Cara Mendapat `mealPlanItemId`:**\nCopy nilai `id` dari salah satu item di response `GET /api/meal-plan`, contoh: `days[0].meals.LUNCH[0].id`\n\nIsi variabel `mealPlanItemId` di Collection Variables, atau ganti langsung di URL."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Akses ditolak\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Endpoint utama untuk generate, mengambil, dan mengelola meal plan 7 hari.\n\n⚠️ Semua endpoint membutuhkan user yang sudah login dan profil yang sudah diisi."
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "mealPlanItemId",
+      "value": "",
+      "description": "Isi dengan id item dari response GET /api/meal-plan"
+    }
+  ]
+}
