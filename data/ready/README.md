@@ -21,6 +21,7 @@ Folder ini berisi dataset final dari tim Data Science yang sudah siap dipakai ol
 - Label alergen: `contains_gluten`, `contains_dairy`, `contains_nuts`, `contains_peanut`, `contains_seafood`, `contains_egg`, `contains_soy`, `contains_celery`, `contains_mustard`, `contains_sesame`, `contains_sulfite`, `contains_other`, `contains_unknown`
 - Kualitas label: `confidence`, `allergen_sources`, `label_sources`, `allergen_match_count`, `merge_status`
 - Konteks makanan: `food_category`, `base_ingredient`, `suitable_breakfast`, `suitable_lunch`, `suitable_dinner`, `meal_time_tags`, `primary_meal_time`
+- Referensi resep: `recipe_reference_match`, `recipe_reference_source`, `recipe_reference_title`, `recipe_ingredients_reference`
 
 ## Fitur Konteks Makanan
 
@@ -30,6 +31,14 @@ Fitur konteks ditambahkan agar rekomendasi tidak hanya memilih makanan dengan sk
 - `base_ingredient` untuk variasi bahan dasar, misalnya `ayam`, `sapi`, `ikan`, `telur`, `kedelai`, `beras`, `umbi`, dan lainnya.
 - `suitable_breakfast`, `suitable_lunch`, `suitable_dinner` sebagai filter multilabel waktu makan.
 - `primary_meal_time` sebagai kelas utama jika model/API butuh satu label saja.
+- `recipe_reference_match` untuk menandai makanan yang berhasil diperkaya dari dataset resep tambahan.
+
+Dataset tambahan yang dipakai untuk memperkuat fitur konteks:
+
+- Indonesian Food Recipes Dataset.
+- Indonesian Food Recipes by main ingredient.
+- Global Cuisine Meals with Diet Labels.
+- Recipes Dataset 64k Dishes.
 
 ## Catatan Keamanan Alergi
 
