@@ -1,6 +1,6 @@
 metric,value
-food_master_path,D:\PPL 1\DBD\ORang A\nutrimatch-capstone-dsA\data\processed\food_master_clean.csv
-food_master_score,40
+food_master_path,D:\PPL 1\DBD\orang_a\nutrimatch-capstone-dsA_20260526\nutrimatch-capstone-dsA\data\processed\food_master_terbaru.csv
+food_master_score,15
 food_master_rows,1332
 train_ready_rows,1332
 exact_name_rows,258

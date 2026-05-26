@@ -22,6 +22,7 @@ Folder ini berisi dataset final dari tim Data Science yang sudah siap dipakai ol
 - Kualitas label: `confidence`, `allergen_sources`, `label_sources`, `allergen_match_count`, `merge_status`
 - Konteks makanan: `food_category`, `base_ingredient`, `suitable_breakfast`, `suitable_lunch`, `suitable_dinner`, `meal_time_tags`, `primary_meal_time`
 - Referensi resep: `recipe_reference_match`, `recipe_reference_source`, `recipe_reference_title`, `recipe_ingredients_reference`
+- Konteks dari update Orang A: `cooking_category`, `main_ingredient`, `meal_time`
 
 ## Fitur Konteks Makanan
 
@@ -54,3 +55,11 @@ keyword_fallback_rows : 3
 not_matched_rows      : 1071
 conservative_unknown  : True
 ```
+
+## Update Terbaru
+
+Versi terbaru memakai `food_master_terbaru.csv` dari update Orang A tanggal 26 Mei 2026. Kolom tambahan dari Orang A yang sudah masuk:
+
+- `cooking_category`
+- `main_ingredient`
+- `meal_time`

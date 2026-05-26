@@ -20,6 +20,7 @@
   ],
   "notes": [
     "Features are rule-based and intended to improve recommendation diversity.",
+    "When available, Orang A columns cooking_category, main_ingredient, and meal_time are used as stronger context signals.",
     "Recipe references from Dataset/archive through Dataset/archive (3) are used when title matching is available.",
     "Meal time is represented as both multilabel booleans and a primary class.",
     "contains_unknown should still be used as an allergy safety guardrail."
