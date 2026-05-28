@@ -126,6 +126,8 @@ model MealPlan {
   startDate      DateTime @map("start_date")
   endDate        DateTime @map("end_date")
   targetCalories Float    @map("target_calories")
+  source         String   @default("ai")
+  narrativeSummary String? @map("narrative_summary")
   createdAt      DateTime @default(now()) @map("created_at")
 
   items MealPlanItem[]
@@ -148,6 +150,8 @@ model MealPlanItem {
   proteinG Float @map("protein_g")
   carbsG   Float @map("carbs_g")
   fatG     Float @map("fat_g")
+  caloriesPer100g Float? @map("calories_per_100g")
+  matchScore      Float? @map("match_score")
 
   @@map("meal_plan_items")
 }

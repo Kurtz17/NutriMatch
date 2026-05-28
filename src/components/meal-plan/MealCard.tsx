@@ -12,6 +12,21 @@ export function MealCard({
   meal: Meal;
   onOpen?: (meal: Meal) => void;
 }) {
+  const stats =
+    meal.matchScore == null
+      ? [
+          ["Cal", meal.calories],
+          ["Protein", `${meal.protein}g`],
+          ["Carbs", `${meal.carbs}g`],
+          ["Fat", `${meal.fat}g`],
+        ]
+      : [
+          ["Cal", meal.calories],
+          ["Grams", `${meal.idealGrams ?? 0}g`],
+          ["/100g", meal.calories100g ?? 0],
+          ["Match", meal.matchScore],
+        ];
+
   return (
     <Card className="overflow-hidden">
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-brand-50">
@@ -38,12 +53,7 @@ export function MealCard({
         </div>
 
         <div className="mt-4 grid grid-cols-4 gap-2 text-center">
-          {[
-            ["Cal", meal.calories],
-            ["Protein", `${meal.protein}g`],
-            ["Carbs", `${meal.carbs}g`],
-            ["Fat", `${meal.fat}g`],
-          ].map(([label, value]) => (
+          {stats.map(([label, value]) => (
             <div key={label} className="rounded-lg bg-slate-50 px-2 py-3">
               <p className="text-xs font-semibold text-muted">{label}</p>
               <p className="mt-1 text-sm font-bold text-ink">{value}</p>

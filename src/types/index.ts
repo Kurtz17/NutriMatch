@@ -9,18 +9,11 @@ export type ActivityLevel =
 
 export type DietGoal = "Lose weight" | "Maintain weight" | "Gain weight";
 
-export type AllergyId =
-  | "seafood"
-  | "nuts"
-  | "gluten"
-  | "dairy"
-  | "egg"
-  | "soy"
-  | "shellfish"
-  | "wheat";
+export type AllergyId = string;
 
 export interface Allergy {
   id: AllergyId;
+  slug?: string;
   label: string;
   description: string;
 }
@@ -67,6 +60,9 @@ export interface Meal {
   protein: number;
   carbs: number;
   fat: number;
+  calories100g?: number;
+  idealGrams?: number;
+  matchScore?: number;
   image: string;
   ingredients: string[];
   allergySafe: boolean;
