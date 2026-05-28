@@ -5,9 +5,11 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     const { email, password, name } = await request.json();
+    const normalizedEmail = String(email ?? "").trim().toLowerCase();
+    const normalizedName = String(name ?? "").trim();
 
     // --- Validasi input ---
-    if (!email || !password || !name) {
+    if (!normalizedEmail || !password || !normalizedName) {
       return NextResponse.json(
         { error: "Email, password, dan nama wajib diisi" },
         { status: 400 }
@@ -21,15 +23,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const existingUser = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+      select: { id: true },
+    });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "Email sudah terdaftar. Silakan login." },
+        { status: 409 }
+      );
+    }
+
     const supabase = await createClient();
 
     // --- Step 1: Daftarkan user ke Supabase Auth ---
     const { data: authData, error: authError } =
       await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
-          data: { name },
+          data: { name: normalizedName },
         },
       });
 
@@ -51,14 +65,17 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.create({
       data: {
         id: authData.user.id,
-        email: authData.user.email!,
-        name,
+        email: authData.user.email ?? normalizedEmail,
+        name: normalizedName,
       },
     });
 
     return NextResponse.json(
       {
-        message: "Registrasi berhasil! Silakan cek email untuk verifikasi.",
+        message: authData.session
+          ? "Registrasi berhasil"
+          : "Registrasi berhasil. Silakan cek email untuk verifikasi.",
+        requiresEmailConfirmation: !authData.session,
         user: {
           id: user.id,
           email: user.email,
