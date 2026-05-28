@@ -3,12 +3,15 @@ import { Bean, Egg, Fish, Milk, Nut, Shell, ShieldCheck, Wheat } from "lucide-re
 import type { Allergy, AllergyId } from "@/types";
 import { cn } from "@/lib/utils";
 
-const allergyIcons: Record<AllergyId, LucideIcon> = {
+const allergyIcons: Record<string, LucideIcon> = {
   seafood: Fish,
+  kacang: Nut,
   nuts: Nut,
   gluten: Wheat,
   dairy: Milk,
+  telur: Egg,
   egg: Egg,
+  kedelai: Bean,
   soy: Bean,
   shellfish: Shell,
   wheat: Wheat,
@@ -23,14 +26,14 @@ export function AllergyCard({
   selected: boolean;
   onToggle?: (id: AllergyId) => void;
 }) {
-  const Icon = allergyIcons[allergy.id];
+  const Icon = allergyIcons[allergy.slug ?? allergy.id] ?? ShieldCheck;
 
   return (
     <button
       type="button"
       onClick={() => onToggle?.(allergy.id)}
       className={cn(
-        "min-h-32 rounded-lg border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-card focus:outline-none focus:ring-2 focus:ring-brand-500",
+        "flex min-h-40 w-full flex-col rounded-lg border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-card focus:outline-none focus:ring-2 focus:ring-brand-500 sm:p-5",
         selected ? "border-brand-500 bg-brand-50" : "border-slate-200",
       )}
     >
@@ -49,8 +52,12 @@ export function AllergyCard({
           </span>
         ) : null}
       </div>
-      <p className="mt-4 font-bold text-ink">{allergy.label}</p>
-      <p className="mt-1 text-sm leading-5 text-muted">{allergy.description}</p>
+      <div className="mt-auto pt-4">
+        <p className="font-bold text-ink">{allergy.label}</p>
+        <p className="mt-1 text-sm leading-5 text-muted">
+          {allergy.description}
+        </p>
+      </div>
     </button>
   );
 }

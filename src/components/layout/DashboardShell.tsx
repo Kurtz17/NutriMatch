@@ -1,12 +1,10 @@
-import { Sidebar } from "@/components/layout/Sidebar";
+import { Navbar } from "@/components/layout/Navbar";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <main className="w-full min-w-0">{children}</main>
-      </div>
+      <Navbar />
+      <main className="w-full min-w-0">{children}</main>
     </div>
   );
 }

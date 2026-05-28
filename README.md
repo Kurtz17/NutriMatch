@@ -20,9 +20,7 @@ NutriMatch bertujuan untuk:
 
 ## Konsep Aplikasi
 
-NutriMatch bekerja dengan mengumpulkan informasi dasar pengguna, seperti data tubuh, aktivitas, tujuan diet, dan alergi. Dari data tersebut, aplikasi menampilkan ringkasan kebutuhan nutrisi dan rekomendasi meal plan mingguan.
-
-Pada prototype ini, data yang digunakan masih berupa mock data. Artinya, aplikasi belum terhubung ke backend atau model rekomendasi asli, tetapi alur dan tampilan sudah disiapkan untuk menggambarkan cara kerja produk ketika sistem lengkap sudah tersedia.
+NutriMatch bekerja dengan mengumpulkan informasi dasar pengguna, seperti data tubuh, aktivitas, tujuan diet, dan alergi. Dari data tersebut, aplikasi menyimpan profil pengguna, menghitung ringkasan kebutuhan nutrisi, dan membuat rekomendasi meal plan mingguan melalui API aplikasi.
 
 ## Alur Pengguna
 
@@ -71,7 +69,7 @@ Setiap makanan memiliki detail berupa:
 
 ### AI Nutrition Insight
 
-Prototype ini juga menampilkan insight nutrisi berbasis AI secara konseptual. Insight ini menjelaskan rekomendasi dalam bahasa yang lebih mudah dipahami pengguna, seperti alasan makanan cocok dengan target kalori atau kebutuhan makro.
+Dashboard menampilkan insight nutrisi dari profil tersimpan, seperti target kalori, BMR, TDEE, dan jumlah filter alergi aktif agar rekomendasi lebih mudah dipahami pengguna.
 
 ## Halaman Aplikasi
 
