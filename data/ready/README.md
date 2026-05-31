@@ -6,13 +6,15 @@ Folder ini berisi dataset final dari tim Data Science yang sudah siap dipakai ol
 
 | File | Keterangan |
 |---|---|
-| `train_ready_dataset.csv` | Dataset makanan final berisi nutrisi per 100g, label alergen multi-label, confidence, dan status merge. |
+| `train_ready_dataset.csv` | Dataset makanan final berisi nutrisi per 100g, label alergen multi-label, konteks makanan, dan filter item siap rekomendasi. |
 | `user_profile_features_schema.csv` | Schema fitur profil pengguna untuk perhitungan BMR/TDEE, target kalori, dan target makro. |
 | `food_master_standardized.csv` | Food master bersih dari Orang A sebelum digabung dengan label alergen. |
 | `merge_summary.csv` | Ringkasan hasil merge Orang A + Orang B. |
 | `merge_metadata.json` | Metadata input/output proses merge. |
 | `feature_enrichment_summary.csv` | Ringkasan distribusi kategori makanan, bahan dasar, dan waktu makan. |
 | `feature_enrichment_metadata.json` | Metadata rule enrichment fitur konteks makanan. |
+| `menu_ready_filter_summary.csv` | Ringkasan filter real-food/menu-ready. |
+| `menu_ready_filter_metadata.json` | Metadata rule filter agar bahan mentah tidak masuk file utama. |
 
 ## Kolom Penting `train_ready_dataset.csv`
 
@@ -23,6 +25,7 @@ Folder ini berisi dataset final dari tim Data Science yang sudah siap dipakai ol
 - Konteks makanan: `food_category`, `base_ingredient`, `suitable_breakfast`, `suitable_lunch`, `suitable_dinner`, `meal_time_tags`, `primary_meal_time`
 - Referensi resep: `recipe_reference_match`, `recipe_reference_source`, `recipe_reference_title`, `recipe_ingredients_reference`
 - Konteks dari update Orang A: `cooking_category`, `main_ingredient`, `meal_time`
+- Filter siap rekomendasi: `is_recommendable_food`, `recommendation_item_type`, `recommendation_confidence`, `ingredient_only_flag`, `raw_ingredient_flag`, `recommendation_exclusion_reason`
 
 ## Fitur Konteks Makanan
 
@@ -33,6 +36,8 @@ Fitur konteks ditambahkan agar rekomendasi tidak hanya memilih makanan dengan sk
 - `suitable_breakfast`, `suitable_lunch`, `suitable_dinner` sebagai filter multilabel waktu makan.
 - `primary_meal_time` sebagai kelas utama jika model/API butuh satu label saja.
 - `recipe_reference_match` untuk menandai makanan yang berhasil diperkaya dari dataset resep tambahan.
+- `recommendation_item_type` untuk membedakan menu, sayur, buah, snack, minuman, staple, dan protein dish.
+- `is_recommendable_food=True` pada file utama karena row bahan mentah/bumbu sudah dipisahkan di repo Data Science sebagai audit.
 
 Dataset tambahan yang dipakai untuk memperkuat fitur konteks:
 
@@ -40,6 +45,9 @@ Dataset tambahan yang dipakai untuk memperkuat fitur konteks:
 - Indonesian Food Recipes by main ingredient.
 - Global Cuisine Meals with Diet Labels.
 - Recipes Dataset 64k Dishes.
+- South Asian Recipes with Nutrition & Steps.
+- Food and Vegetable Nutrition Dataset.
+- Nutrition5k Dataset.
 
 ## Catatan Keamanan Alergi
 
@@ -49,7 +57,7 @@ Jika `contains_unknown=True`, makanan tersebut belum punya bukti label alergen y
 
 ```text
 food_master_rows      : 1332
-train_ready_rows      : 1332
+train_ready_rows      : 974
 exact_name_rows       : 258
 keyword_fallback_rows : 3
 not_matched_rows      : 1071
@@ -63,3 +71,5 @@ Versi terbaru memakai `food_master_terbaru.csv` dari update Orang A tanggal 26 M
 - `cooking_category`
 - `main_ingredient`
 - `meal_time`
+
+Update filter menu-ready menurunkan file utama dari 1332 row menjadi 974 row rekomendasi. Bahan mentah, bumbu/kondimen, tepung/beras mentah, dan protein hewani mentah tidak masuk `train_ready_dataset.csv`.
