@@ -14,7 +14,7 @@ Folder ini berisi dataset final dari tim Data Science yang sudah siap dipakai ol
 | `feature_enrichment_summary.csv` | Ringkasan distribusi kategori makanan, bahan dasar, dan waktu makan. |
 | `feature_enrichment_metadata.json` | Metadata rule enrichment fitur konteks makanan. |
 | `menu_ready_filter_summary.csv` | Ringkasan filter real-food/menu-ready. |
-| `menu_ready_filter_metadata.json` | Metadata rule filter agar bahan mentah tidak masuk file utama. |
+| `menu_ready_filter_metadata.json` | Metadata rule filter agar bahan mentah tidak masuk file utama dan rule status halal. |
 
 ## Kolom Penting `train_ready_dataset.csv`
 
@@ -26,6 +26,7 @@ Folder ini berisi dataset final dari tim Data Science yang sudah siap dipakai ol
 - Referensi resep: `recipe_reference_match`, `recipe_reference_source`, `recipe_reference_title`, `recipe_ingredients_reference`
 - Konteks dari update Orang A: `cooking_category`, `main_ingredient`, `meal_time`
 - Filter siap rekomendasi: `is_recommendable_food`, `recommendation_item_type`, `recommendation_confidence`, `ingredient_only_flag`, `raw_ingredient_flag`, `recommendation_exclusion_reason`
+- Status halal: `halal_status`, `is_halal_candidate`, `contains_non_halal_ingredient`, `non_halal_ingredient_tags`, `halal_review_reason`, `halal_confidence`
 
 ## Fitur Konteks Makanan
 
@@ -38,6 +39,8 @@ Fitur konteks ditambahkan agar rekomendasi tidak hanya memilih makanan dengan sk
 - `recipe_reference_match` untuk menandai makanan yang berhasil diperkaya dari dataset resep tambahan.
 - `recommendation_item_type` untuk membedakan menu, sayur, buah, snack, minuman, staple, dan protein dish.
 - `is_recommendable_food=True` pada file utama karena row bahan mentah/bumbu sudah dipisahkan di repo Data Science sebagai audit.
+- `halal_status` untuk filter halal: `halal_candidate`, `non_halal`, atau `needs_review`.
+- `is_halal_candidate=True` dapat dipakai untuk mode halal-only. Nilai ini adalah rule-based guardrail, bukan sertifikasi halal resmi.
 
 Dataset tambahan yang dipakai untuk memperkuat fitur konteks:
 
@@ -57,11 +60,14 @@ Jika `contains_unknown=True`, makanan tersebut belum punya bukti label alergen y
 
 ```text
 food_master_rows      : 1332
-train_ready_rows      : 974
+train_ready_rows      : 975
 exact_name_rows       : 258
 keyword_fallback_rows : 3
 not_matched_rows      : 1071
 conservative_unknown  : True
+halal_candidate_rows  : 958
+non_halal_rows        : 9
+needs_review_rows     : 8
 ```
 
 ## Update Terbaru
@@ -72,4 +78,6 @@ Versi terbaru memakai `food_master_terbaru.csv` dari update Orang A tanggal 26 M
 - `main_ingredient`
 - `meal_time`
 
-Update filter menu-ready menurunkan file utama dari 1332 row menjadi 974 row rekomendasi. Bahan mentah, bumbu/kondimen, tepung/beras mentah, dan protein hewani mentah tidak masuk `train_ready_dataset.csv`.
+Update filter menu-ready menurunkan file utama dari 1332 row menjadi 975 row rekomendasi. Bahan mentah, bumbu/kondimen, tepung/beras mentah, dan protein hewani mentah tidak masuk `train_ready_dataset.csv`.
+
+Update status halal menandai keyword eksplisit seperti babi, anjing, dan alkohol sebagai `non_halal`. Item sensitif seperti penyu, paniki, katak, keong, dan kura-kura diberi `needs_review`.
