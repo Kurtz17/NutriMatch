@@ -5,10 +5,14 @@ import { generateMealPlan } from "@/lib/mealPlanGenerator";
 import {
   AiRecommendationError,
   buildRecommendRequest,
+  isEmptyRecommendationError,
   isMealFallbackEnabled,
   type NormalizedMealRecommendationResult,
   requestAiMealRecommendation,
 } from "@/lib/ai/recommendationClient";
+
+export const runtime = "nodejs";
+export const maxDuration = 120;
 
 function normalizeFallbackItems(
   items: Awaited<ReturnType<typeof generateMealPlan>>,
@@ -24,6 +28,9 @@ function normalizeFallbackItems(
           foodName: item.foodName,
           idealGrams: item.servingG,
           idealCalories: item.calories,
+          idealProtein: item.proteinG,
+          idealFat: item.fatG,
+          idealCarb: item.carbsG,
         }));
 
       return {
@@ -73,13 +80,12 @@ export async function POST() {
     }
 
     try {
-      const result = await requestAiMealRecommendation(
-        buildRecommendRequest(profile),
-      );
+      const { requestBody } = buildRecommendRequest(profile);
+      const result = await requestAiMealRecommendation(requestBody);
 
       return NextResponse.json(result);
     } catch (error) {
-      if (!isMealFallbackEnabled()) {
+      if (!isMealFallbackEnabled() && !isEmptyRecommendationError(error)) {
         const errorMessage =
           error instanceof AiRecommendationError
             ? error.message
