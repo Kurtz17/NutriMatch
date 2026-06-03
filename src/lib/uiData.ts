@@ -13,8 +13,12 @@ type MealItem = {
   food: {
     name: string;
     category?: string | null;
+    imageUrl?: string | null;
   };
 };
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=900&q=80";
 
 const imageByCategory: Record<string, string> = {
   Karbohidrat:
@@ -73,6 +77,11 @@ export function mealTypeLabel(mealType: string): MealType {
 
 export function toUiMeal(item: MealItem): Meal {
   const category = item.food.category ?? "";
+  // Prioritize imageUrl from food DB (set by AI), fallback to category image
+  const image =
+    item.food.imageUrl ||
+    imageByCategory[category] ||
+    FALLBACK_IMAGE;
 
   return {
     id: item.id,
@@ -87,7 +96,7 @@ export function toUiMeal(item: MealItem): Meal {
     idealGrams: Math.round(item.servingG),
     matchScore:
       item.matchScore == null ? undefined : Math.round(item.matchScore * 100) / 100,
-    image: imageByCategory[category] ?? imageByCategory["Makanan Khas"],
+    image,
     ingredients: [
       item.food.name,
       `${Math.round(item.servingG)}g serving`,
@@ -103,6 +112,8 @@ export function toUiMeal(item: MealItem): Meal {
   };
 }
 
+const MEAL_TYPE_ORDER: MealType[] = ["Breakfast", "Lunch", "Dinner", "Snack"];
+
 export function toUiMealPlanDays(
   days: Array<{
     dayNumber: number;
@@ -115,11 +126,26 @@ export function toUiMealPlanDays(
       (mealType) => day.meals[mealType] ?? [],
     );
 
+    const uiMeals = meals.map(toUiMeal);
+
+    const mealsByType: Record<MealType, Meal[]> = {
+      Breakfast: [],
+      Lunch: [],
+      Dinner: [],
+      Snack: [],
+    };
+    for (const meal of uiMeals) {
+      mealsByType[meal.type].push(meal);
+    }
+
     return {
       day: day.dayNumber,
       label: `Day ${day.dayNumber}`,
       calories: day.totalCalories,
-      meals: meals.map(toUiMeal),
+      meals: uiMeals,
+      mealsByType,
     };
   });
 }
+
+export { MEAL_TYPE_ORDER };
