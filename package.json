@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "api:dev": "tsx src/server/index.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint ."
@@ -13,7 +14,9 @@
     "@prisma/client": "^7.8.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.0",
+    "@types/express": "^5.0.6",
     "clsx": "2.1.1",
+    "express": "^5.2.1",
     "lucide-react": "1.16.0",
     "next": "16.2.6",
     "pg": "^8.20.0",
