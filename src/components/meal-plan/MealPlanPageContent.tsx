@@ -4,10 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  Coffee,
+  Moon,
   RefreshCcw,
   ShieldCheck,
   Sparkles,
+  Sun,
   TriangleAlert,
+  UtensilsCrossed,
   X,
 } from "lucide-react";
 import { DashboardShell } from "@/components/layout/DashboardShell";
@@ -17,8 +21,17 @@ import { MealPlanTabs } from "@/components/meal-plan/MealPlanTabs";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonStyles } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { buildNutritionSummary, toUiMealPlanDays } from "@/lib/uiData";
-import type { Meal, MealPlanDay, NutritionSummary } from "@/types";
+import {
+  localIsoDate,
+  parseStoredRecommendationPayload,
+  RECOMMENDATION_PAYLOAD_STORAGE_KEY,
+} from "@/lib/recommendationPayload";
+import {
+  buildNutritionSummary,
+  MEAL_TYPE_ORDER,
+  toUiMealPlanDays,
+} from "@/lib/uiData";
+import type { Meal, MealPlanDay, MealType, NutritionSummary } from "@/types";
 
 type ApiProfile = {
   bmr: number | null;
@@ -27,6 +40,7 @@ type ApiProfile = {
   allergies: Array<{
     allergen: {
       name: string;
+      slug?: string;
     };
   }>;
 };
@@ -49,6 +63,7 @@ type ApiMealPlanDay = {
       food: {
         name: string;
         category?: string | null;
+        imageUrl?: string | null;
       };
     }>
   >;
@@ -61,6 +76,103 @@ type ApiMealPlanResponse = {
     days: ApiMealPlanDay[];
   };
 };
+
+const MEAL_SECTION_META: Record<
+  MealType,
+  { icon: React.ReactNode; label: string; description: string; color: string; bg: string }
+> = {
+  Breakfast: {
+    icon: <Coffee className="h-5 w-5" />,
+    label: "Sarapan",
+    description: "Mulai hari dengan energi yang cukup",
+    color: "text-amber-700",
+    bg: "bg-amber-50 border-amber-200",
+  },
+  Lunch: {
+    icon: <Sun className="h-5 w-5" />,
+    label: "Makan Siang",
+    description: "Isi ulang energi di tengah hari",
+    color: "text-orange-700",
+    bg: "bg-orange-50 border-orange-200",
+  },
+  Dinner: {
+    icon: <Moon className="h-5 w-5" />,
+    label: "Makan Malam",
+    description: "Tutup hari dengan makan yang seimbang",
+    color: "text-indigo-700",
+    bg: "bg-indigo-50 border-indigo-200",
+  },
+  Snack: {
+    icon: <UtensilsCrossed className="h-5 w-5" />,
+    label: "Camilan",
+    description: "Cemilan sehat di antara waktu makan",
+    color: "text-emerald-700",
+    bg: "bg-emerald-50 border-emerald-200",
+  },
+};
+
+function HalalOnlyCheckbox({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-1 h-4 w-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500"
+      />
+      <span>
+        <span className="block text-sm font-bold text-emerald-950">
+          Halal only
+        </span>
+        <span className="mt-1 block text-xs leading-5 text-emerald-800">
+          Kirim filter halal ke AI saat membuat meal plan.
+        </span>
+      </span>
+    </label>
+  );
+}
+
+function MealSection({
+  mealType,
+  meals,
+  onOpenMeal,
+}: {
+  mealType: MealType;
+  meals: Meal[];
+  onOpenMeal: (meal: Meal) => void;
+}) {
+  if (meals.length === 0) return null;
+  const meta = MEAL_SECTION_META[mealType];
+  const totalCals = meals.reduce((s, m) => s + m.calories, 0);
+
+  return (
+    <div className="mb-8">
+      <div className={`mb-4 flex items-center justify-between rounded-xl border px-4 py-3 ${meta.bg}`}>
+        <div className={`flex items-center gap-2.5 ${meta.color}`}>
+          {meta.icon}
+          <div>
+            <p className={`font-bold ${meta.color}`}>{meta.label}</p>
+            <p className="text-xs text-muted">{meta.description}</p>
+          </div>
+        </div>
+        <span className={`text-sm font-bold ${meta.color}`}>
+          {Math.round(totalCals)} kcal
+        </span>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {meals.map((meal) => (
+          <MealCard key={meal.id} meal={meal} onOpen={onOpenMeal} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function MealPlanPageContent() {
   const [activeDay, setActiveDay] = useState(1);
@@ -76,6 +188,14 @@ export function MealPlanPageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
+  const [halalOnly, setHalalOnly] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return (
+      parseStoredRecommendationPayload(
+        window.localStorage.getItem(RECOMMENDATION_PAYLOAD_STORAGE_KEY),
+      )?.halal_only ?? false
+    );
+  });
 
   async function loadMealPlan() {
     setError("");
@@ -108,10 +228,9 @@ export function MealPlanPageContent() {
       if (mealPlanResponse.ok) {
         const mealPlanData = await mealPlanResponse.json();
         const mealPlan = (mealPlanData as ApiMealPlanResponse).mealPlan;
-        const apiDays = mealPlan.days;
         setRecommendationSource(mealPlan.source ?? null);
         setNarrativeSummary(mealPlan.narrativeSummary ?? "");
-        setDays(toUiMealPlanDays(apiDays));
+        setDays(toUiMealPlanDays(mealPlan.days));
       } else {
         setRecommendationSource(null);
         setNarrativeSummary("");
@@ -128,7 +247,6 @@ export function MealPlanPageContent() {
     const timer = window.setTimeout(() => {
       loadMealPlan();
     }, 0);
-
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -138,6 +256,7 @@ export function MealPlanPageContent() {
   );
 
   const weeklyCalories = days.reduce((total, day) => total + day.calories, 0);
+
   const selectedMealStats =
     selectedMeal?.matchScore == null
       ? [
@@ -158,12 +277,31 @@ export function MealPlanPageContent() {
     setIsGenerating(true);
 
     try {
-      const response = await fetch("/api/meal-plan", { method: "POST" });
+      const savedPayload = parseStoredRecommendationPayload(
+        window.localStorage.getItem(RECOMMENDATION_PAYLOAD_STORAGE_KEY),
+      );
+      const requestPayload = {
+        ...(savedPayload ?? {}),
+        start_date: localIsoDate(),
+        days: 7,
+        variety_penalty: 0.15,
+        halal_only: halalOnly,
+      };
+      window.localStorage.setItem(
+        RECOMMENDATION_PAYLOAD_STORAGE_KEY,
+        JSON.stringify(requestPayload),
+      );
+      const response = await fetch("/api/meal-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestPayload),
+      });
       const data = await response.json();
 
       if (!response.ok) {
+        const details = Array.isArray(data.details) ? data.details : [];
         setError(
-          [data.error, data.detail].filter(Boolean).join(" ") ||
+          [data.error, data.detail, ...details].filter(Boolean).join(" ") ||
             "Gagal generate meal plan.",
         );
         return;
@@ -181,6 +319,7 @@ export function MealPlanPageContent() {
   return (
     <DashboardShell>
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
+        {/* Header */}
         <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
             <p className="text-sm font-semibold text-brand-700">
@@ -206,6 +345,7 @@ export function MealPlanPageContent() {
           </p>
         ) : null}
 
+        {/* Loading state */}
         {isLoading ? (
           <Card>
             <CardContent>
@@ -245,22 +385,30 @@ export function MealPlanPageContent() {
                 Generate your first weekly plan
               </h2>
               <p className="mt-3 text-sm leading-6 text-muted">
-                NutriMatch will use your saved calorie target and exclude foods
-                that match selected allergens.
+                NutriMatch will use the recommendation settings saved on your
+                profile.
               </p>
-              <Button
-                className="mt-6"
-                size="lg"
-                onClick={generateMealPlan}
-                disabled={isGenerating}
-              >
-                <RefreshCcw className="h-5 w-5" />
-                {isGenerating ? "Generating..." : "Generate meal plan"}
-              </Button>
+              <div className="mt-5 max-w-md">
+                <HalalOnlyCheckbox checked={halalOnly} onChange={setHalalOnly} />
+              </div>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Button size="lg" onClick={generateMealPlan} disabled={isGenerating}>
+                  <RefreshCcw className="h-5 w-5" />
+                  {isGenerating ? "Generating..." : "Generate meal plan"}
+                </Button>
+                <Link
+                  href="/profile"
+                  className={buttonStyles({ variant: "outline", size: "lg" })}
+                >
+                  Edit preferences
+                </Link>
+              </div>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 xl:grid-cols-[1fr_380px]">
+          /* Main content: tabs + sections + sidebar */
+          <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+            {/* Left: day tabs + meal sections */}
             <div className="min-w-0">
               <MealPlanTabs
                 days={days}
@@ -268,13 +416,45 @@ export function MealPlanPageContent() {
                 onChange={setActiveDay}
               />
 
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                {currentDay?.meals.map((meal) => (
-                  <MealCard key={meal.id} meal={meal} onOpen={setSelectedMeal} />
+              {/* Daily summary bar */}
+              {currentDay && (
+                <div className="mt-4 mb-6 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-5 py-3">
+                  <div>
+                    <p className="text-xs font-semibold text-muted uppercase tracking-wide">
+                      Total hari ini
+                    </p>
+                    <p className="mt-0.5 text-2xl font-bold text-ink">
+                      {Math.round(currentDay.calories).toLocaleString()} kcal
+                    </p>
+                  </div>
+                  <div className="flex gap-4 text-center">
+                    {(["Breakfast", "Lunch", "Dinner", "Snack"] as MealType[]).map((t) => {
+                      const count = currentDay.mealsByType[t].length;
+                      const meta = MEAL_SECTION_META[t];
+                      return (
+                        <div key={t} className="hidden sm:block">
+                          <p className={`text-xs font-semibold ${meta.color}`}>{meta.label}</p>
+                          <p className="mt-0.5 text-sm font-bold text-ink">{count} item</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Meal sections per type */}
+              {currentDay &&
+                MEAL_TYPE_ORDER.map((mealType) => (
+                  <MealSection
+                    key={mealType}
+                    mealType={mealType}
+                    meals={currentDay.mealsByType[mealType]}
+                    onOpenMeal={setSelectedMeal}
+                  />
                 ))}
-              </div>
             </div>
 
+            {/* Right sidebar */}
             <div className="space-y-4">
               {narrativeSummary ? (
                 <Card>
@@ -349,6 +529,8 @@ export function MealPlanPageContent() {
 
               {summary ? <MacroDistributionCard summary={summary} /> : null}
 
+              <HalalOnlyCheckbox checked={halalOnly} onChange={setHalalOnly} />
+
               <Button
                 className="w-full"
                 variant="secondary"
@@ -363,6 +545,7 @@ export function MealPlanPageContent() {
         )}
       </div>
 
+      {/* Meal detail modal */}
       {selectedMeal ? (
         <div
           role="dialog"
@@ -391,7 +574,7 @@ export function MealPlanPageContent() {
               <div className="relative min-h-80 bg-brand-50">
                 <Image
                   src={selectedMeal.image}
-                  alt=""
+                  alt={selectedMeal.name}
                   fill
                   sizes="(min-width: 1024px) 420px, 100vw"
                   className="object-cover"
@@ -436,9 +619,7 @@ export function MealPlanPageContent() {
                   <div className="flex gap-3">
                     <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
                     <div>
-                      <h3 className="font-bold text-ink">
-                        Why this meal fits you
-                      </h3>
+                      <h3 className="font-bold text-ink">Why this meal fits you</h3>
                       <p className="mt-2 text-sm leading-6 text-muted">
                         {selectedMeal.fitReason}
                       </p>

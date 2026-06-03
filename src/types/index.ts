@@ -75,4 +75,5 @@ export interface MealPlanDay {
   label: string;
   calories: number;
   meals: Meal[];
+  mealsByType: Record<MealType, Meal[]>;
 }

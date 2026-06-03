@@ -92,7 +92,8 @@ export function calculateNutritionByServing(
 export async function generateMealPlan(
   userId: string,
   targetCalories: number,
-  allergenIds: string[]  
+  allergenIds: string[],
+  days = 7,
 ): Promise<GeneratedMealItem[]> {
 
   const safeFoods = await prisma.food.findMany({
@@ -129,7 +130,7 @@ export async function generateMealPlan(
   const mealSlots = getMealSlots(targetCalories);
   const result: GeneratedMealItem[] = [];
 
-  for (let day = 1; day <= 7; day++) {
+  for (let day = 1; day <= days; day++) {
     for (const slot of mealSlots) {
       const candidates = slot.categories
         .flatMap((cat) => foodsByCategory[cat] ?? [])

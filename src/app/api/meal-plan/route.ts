@@ -1,15 +1,21 @@
 import { MealType } from "@prisma/client";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
-import { generateMealPlan } from "@/lib/mealPlanGenerator";
 import {
   AiRecommendationError,
   buildRecommendRequest,
+  buildTargetMacros,
+  isEmptyRecommendationError,
   isMealFallbackEnabled,
   type NormalizedMealRecommendationResult,
+  type RecommendRequest,
   requestAiMealRecommendation,
 } from "@/lib/ai/recommendationClient";
+
+export const runtime = "nodejs";
+export const maxDuration = 120;
 
 function normalizeMealType(mealName: string): MealType {
   const normalized = mealName.toLowerCase();
@@ -30,71 +36,111 @@ function normalizeMealType(mealName: string): MealType {
   return "SNACK";
 }
 
+function normalizeDayNumber(mealName: string, index: number, days: number) {
+  const normalized = mealName.toLowerCase();
+  const dayMatch = normalized.match(/(?:day|hari)\s*(\d+)/);
+  const parsedDay = dayMatch?.[1] ? Number(dayMatch[1]) : Number.NaN;
+
+  if (Number.isFinite(parsedDay) && parsedDay >= 1) {
+    return Math.min(Math.round(parsedDay), days);
+  }
+
+  if (days > 1 && index >= 3) {
+    return Math.min(Math.floor(index / 3) + 1, days);
+  }
+
+  return 1;
+}
+
+function toPlanStartDate(startDate: string) {
+  return new Date(`${startDate}T00:00:00.000Z`);
+}
+
+function toPlanEndDate(startDate: Date, days: number) {
+  const endDate = new Date(startDate);
+  endDate.setUTCDate(endDate.getUTCDate() + Math.max(days, 1) - 1);
+  return endDate;
+}
+
 async function saveAiMealPlan({
   userId,
-  targetCalories,
+  requestBody,
   result,
 }: {
   userId: string;
-  targetCalories: number;
+  requestBody: RecommendRequest;
   result: NormalizedMealRecommendationResult;
 }) {
-  const startDate = new Date();
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 6);
+  const startDate = toPlanStartDate(requestBody.start_date);
+  const endDate = toPlanEndDate(startDate, requestBody.days);
 
+  // Step 1: collect all unique food names from the AI result
+  const allRecommendations = result.dailyPlan.flatMap((meal, mealIndex) =>
+    meal.recommendations.map((rec) => ({
+      rec,
+      mealType: normalizeMealType(meal.mealName),
+      dayNumber: normalizeDayNumber(meal.mealName, mealIndex, requestBody.days),
+    }))
+  );
+
+  // Step 2: upsert all foods in parallel OUTSIDE the transaction (avoids pgbouncer sequential-await issues)
+  const foodMap = new Map<string, string>(); // foodName → foodId
+  await Promise.all(
+    allRecommendations.map(async ({ rec }) => {
+      const caloriesPer100g = rec.calories100g ?? 0;
+      try {
+        const food = await prisma.food.upsert({
+          where: { name: rec.foodName },
+          update: {
+            caloriesPer100g,
+            ...(rec.imageUrl ? { imageUrl: rec.imageUrl } : {}),
+          },
+          create: {
+            name: rec.foodName,
+            category: "AI Recommendation",
+            caloriesPer100g,
+            imageUrl: rec.imageUrl ?? null,
+            proteinPer100g: 0,
+            carbsPer100g: 0,
+            fatPer100g: 0,
+          },
+        });
+        foodMap.set(rec.foodName, food.id);
+      } catch (e) {
+        console.error("[saveAiMealPlan] food upsert failed for:", rec.foodName, e);
+        throw e;
+      }
+    })
+  );
+
+  // Step 3: create MealPlan + all MealPlanItems in a single efficient transaction
   const savedPlan = await prisma.$transaction(async (tx) => {
     const plan = await tx.mealPlan.create({
       data: {
         userId,
         startDate,
         endDate,
-        targetCalories,
+        targetCalories: requestBody.target_macros.calories,
         source: result.source,
         narrativeSummary: result.narrativeSummary,
       },
     });
 
-    for (const meal of result.dailyPlan) {
-      const mealType = normalizeMealType(meal.mealName);
-
-      for (const recommendation of meal.recommendations) {
-        const caloriesPer100g = recommendation.calories100g ?? 0;
-        const idealGrams = recommendation.idealGrams ?? 100;
-        const idealCalories = recommendation.idealCalories ?? 0;
-
-        const food = await tx.food.upsert({
-          where: { name: recommendation.foodName },
-          update: {
-            caloriesPer100g,
-          },
-          create: {
-            name: recommendation.foodName,
-            category: "AI Recommendation",
-            caloriesPer100g,
-            proteinPer100g: 0,
-            carbsPer100g: 0,
-            fatPer100g: 0,
-          },
-        });
-
-        await tx.mealPlanItem.create({
-          data: {
-            mealPlanId: plan.id,
-            foodId: food.id,
-            dayNumber: 1,
-            mealType,
-            servingG: idealGrams,
-            calories: idealCalories,
-            proteinG: 0,
-            carbsG: 0,
-            fatG: 0,
-            caloriesPer100g,
-            matchScore: recommendation.matchScore,
-          },
-        });
-      }
-    }
+    await tx.mealPlanItem.createMany({
+      data: allRecommendations.map(({ rec, mealType, dayNumber }) => ({
+        mealPlanId: plan.id,
+        foodId: foodMap.get(rec.foodName)!,
+        dayNumber,
+        mealType,
+        servingG: rec.idealGrams ?? 100,
+        calories: rec.idealCalories ?? 0,
+        proteinG: rec.idealProtein ?? 0,
+        carbsG: rec.idealCarb ?? 0,
+        fatG: rec.idealFat ?? 0,
+        caloriesPer100g: rec.calories100g ?? 0,
+        matchScore: rec.matchScore,
+      })),
+    });
 
     return plan;
   });
@@ -102,56 +148,56 @@ async function saveAiMealPlan({
   return { savedPlan, startDate, endDate };
 }
 
+/**
+ * Fallback: retry AI with a simplified no-prefs request.
+ * No local dataset needed — data comes entirely from the AI API.
+ */
 async function saveFallbackMealPlan({
   userId,
-  targetCalories,
-  allergenIds,
+  requestBody,
 }: {
   userId: string;
-  targetCalories: number;
-  allergenIds: string[];
+  requestBody: RecommendRequest;
 }) {
-  const generatedItems = await generateMealPlan(
+  // Build a minimal request: same macros/allergies/days, but strip user prefs & text
+  const simplifiedRequest: RecommendRequest = {
+    target_macros: buildTargetMacros({ targetCalories: requestBody.target_macros.calories }),
+    allergies: requestBody.allergies,
+    breakfast_prefs: { food_category: [], main_ingredients: [] },
+    lunch_prefs: { food_category: [], main_ingredients: [] },
+    dinner_prefs: { food_category: [], main_ingredients: [] },
+    user_text: "Generate a balanced daily meal plan.",
+    start_date: requestBody.start_date,
+    days: requestBody.days,
+    variety_penalty: 0.2,
+    halal_only: requestBody.halal_only,
+  };
+
+  const aiResult = await requestAiMealRecommendation(simplifiedRequest);
+
+  // Mark source as fallback in the result
+  const fallbackResult: NormalizedMealRecommendationResult = {
+    ...aiResult,
+    source: "fallback",
+    narrativeSummary:
+      aiResult.narrativeSummary ??
+      "Generated using a simplified AI request (fallback mode).",
+  };
+
+  const saved = await saveAiMealPlan({
     userId,
-    targetCalories,
-    allergenIds,
-  );
-  const startDate = new Date();
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 6);
-
-  const savedPlan = await prisma.$transaction(async (tx) => {
-    const plan = await tx.mealPlan.create({
-      data: {
-        userId,
-        startDate,
-        endDate,
-        targetCalories,
-        source: "fallback",
-        narrativeSummary:
-          "Generated by the local fallback meal planner because AI recommendation was unavailable.",
-      },
-    });
-
-    await tx.mealPlanItem.createMany({
-      data: generatedItems.map((item) => ({
-        mealPlanId: plan.id,
-        foodId: item.foodId,
-        dayNumber: item.dayNumber,
-        mealType: item.mealType,
-        servingG: item.servingG,
-        calories: item.calories,
-        proteinG: item.proteinG,
-        carbsG: item.carbsG,
-        fatG: item.fatG,
-      })),
-    });
-
-    return plan;
+    requestBody: simplifiedRequest,
+    result: fallbackResult,
   });
 
-  return { savedPlan, startDate, endDate, totalFoodsGenerated: generatedItems.length };
+  const totalFoodsGenerated = aiResult.dailyPlan.reduce(
+    (total, meal) => total + meal.recommendations.length,
+    0,
+  );
+
+  return { ...saved, totalFoodsGenerated };
 }
+
 
 export async function GET() {
   try {
@@ -234,7 +280,7 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const {
@@ -267,43 +313,30 @@ export async function POST() {
     }
 
     const allergenIds = profile.allergies.map((allergy) => allergy.allergenId);
+    const body = await request.json().catch(() => ({}));
+    const { requestBody, errors } = buildRecommendRequest(profile, body);
+
+    if (errors.length > 0) {
+      return NextResponse.json(
+        { error: "Payload rekomendasi tidak valid.", details: errors },
+        { status: 400 },
+      );
+    }
+
     let source: "ai" | "fallback" = "ai";
     let warning: string | undefined;
 
+    // Step 1: call AI — only AI errors are handled here
+    let aiResult: Awaited<ReturnType<typeof requestAiMealRecommendation>> | null = null;
     try {
-      const aiResult = await requestAiMealRecommendation(
-        buildRecommendRequest(profile),
-      );
-      const { savedPlan, startDate, endDate } = await saveAiMealPlan({
-        userId: user.id,
-        targetCalories: profile.targetCalories,
-        result: aiResult,
-      });
+      aiResult = await requestAiMealRecommendation(requestBody);
+    } catch (aiError) {
+      console.error("[meal-plan POST] AI recommendation error:", aiError);
 
-      return NextResponse.json(
-        {
-          message: "AI meal recommendation berhasil dibuat!",
-          source: "ai",
-          mealPlanId: savedPlan.id,
-          narrativeSummary: aiResult.narrativeSummary,
-          summary: {
-            targetCaloriesPerDay: profile.targetCalories,
-            totalFoodsGenerated: aiResult.dailyPlan.reduce(
-              (total, meal) => total + meal.recommendations.length,
-              0,
-            ),
-            startDate: startDate.toISOString().split("T")[0],
-            endDate: endDate.toISOString().split("T")[0],
-            allergenFiltered: allergenIds.length,
-          },
-        },
-        { status: 201 },
-      );
-    } catch (error) {
-      if (!isMealFallbackEnabled()) {
+      if (!isMealFallbackEnabled() && !isEmptyRecommendationError(aiError)) {
         const errorMessage =
-          error instanceof AiRecommendationError
-            ? error.message
+          aiError instanceof AiRecommendationError
+            ? aiError.message
             : "AI recommendation service is unavailable.";
 
         return NextResponse.json(
@@ -315,7 +348,7 @@ export async function POST() {
           },
           {
             status:
-              error instanceof AiRecommendationError && error.status === 422
+              aiError instanceof AiRecommendationError && aiError.status === 422
                 ? 422
                 : 503,
           },
@@ -323,26 +356,57 @@ export async function POST() {
       }
 
       source = "fallback";
-      warning =
-        error instanceof Error
-          ? error.message
-          : "AI recommendation failed. Local fallback was used.";
+      warning = isEmptyRecommendationError(aiError)
+        ? "AI returned an empty recommendation, so local fallback was used."
+        : aiError instanceof Error
+        ? aiError.message
+        : "AI recommendation failed. Local fallback was used.";
+    }
+
+    // Step 2: if AI succeeded, save to DB (DB errors bubble up to outer catch → 500)
+    if (aiResult !== null) {
+      const { savedPlan, startDate, endDate } = await saveAiMealPlan({
+        userId: user.id,
+        requestBody,
+        result: aiResult,
+      });
+
+      return NextResponse.json(
+        {
+          message: "AI meal recommendation berhasil dibuat!",
+          source: "ai",
+          mealPlanId: savedPlan.id,
+          narrativeSummary: aiResult.narrativeSummary,
+          requestPayload: requestBody,
+          summary: {
+            targetCaloriesPerDay: requestBody.target_macros.calories,
+            totalFoodsGenerated: aiResult.dailyPlan.reduce(
+              (total, meal) => total + meal.recommendations.length,
+              0,
+            ),
+            startDate: startDate.toISOString().split("T")[0],
+            endDate: endDate.toISOString().split("T")[0],
+            allergenFiltered: allergenIds.length,
+          },
+        },
+        { status: 201 },
+      );
     }
 
     const fallback = await saveFallbackMealPlan({
       userId: user.id,
-      targetCalories: profile.targetCalories,
-      allergenIds,
+      requestBody,
     });
 
     return NextResponse.json(
       {
-        message: "Meal plan dibuat menggunakan fallback lokal.",
+        message: "Meal plan dibuat menggunakan AI fallback (simplified request).",
         source,
         warning,
         mealPlanId: fallback.savedPlan.id,
+        requestPayload: requestBody,
         summary: {
-          targetCaloriesPerDay: profile.targetCalories,
+          targetCaloriesPerDay: requestBody.target_macros.calories,
           totalFoodsGenerated: fallback.totalFoodsGenerated,
           startDate: fallback.startDate.toISOString().split("T")[0],
           endDate: fallback.endDate.toISOString().split("T")[0],
