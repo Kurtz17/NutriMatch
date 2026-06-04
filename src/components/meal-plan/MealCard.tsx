@@ -15,17 +15,17 @@ export function MealCard({
   const stats =
     meal.matchScore == null
       ? [
-          ["Cal", meal.calories],
-          ["Protein", `${meal.protein}g`],
-          ["Carbs", `${meal.carbs}g`],
-          ["Fat", `${meal.fat}g`],
-        ]
+        ["Cal", meal.calories],
+        ["Protein", `${meal.protein}g`],
+        ["Carbs", `${meal.carbs}g`],
+        ["Fat", `${meal.fat}g`],
+      ]
       : [
-          ["Cal", meal.calories],
-          ["Grams", `${meal.idealGrams ?? 0}g`],
-          ["/100g", meal.calories100g ?? 0],
-          ["Match", meal.matchScore],
-        ];
+        ["Cal", meal.calories],
+        ["Grams", `${meal.idealGrams ?? 0}g`],
+        ["/100g", meal.calories100g ?? 0],
+        ["Match", meal.matchScore],
+      ];
 
   return (
     <Card className="overflow-hidden">

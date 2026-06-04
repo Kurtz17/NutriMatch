@@ -38,7 +38,7 @@ export function LoginPageContent() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  
+
   const urlErrorCode = searchParams.get("error");
   const displayError = error || (urlErrorCode ? ERROR_MESSAGES[urlErrorCode] : "");
 
@@ -75,9 +75,9 @@ export function LoginPageContent() {
   async function handleGoogleLogin() {
     setError("");
     setIsGoogleLoading(true);
- 
+
     const supabase = createClient();
- 
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -87,13 +87,13 @@ export function LoginPageContent() {
         },
       },
     });
- 
+
     if (error) {
       setError("Gagal login dengan Google. Coba lagi.");
       setIsGoogleLoading(false);
     }
   }
- 
+
   const isAnyLoading = isSubmitting || isGoogleLoading;
 
   return (
