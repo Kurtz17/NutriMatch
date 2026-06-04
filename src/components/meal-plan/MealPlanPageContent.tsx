@@ -424,7 +424,14 @@ export function MealPlanPageContent() {
                       Total hari ini
                     </p>
                     <p className="mt-0.5 text-2xl font-bold text-ink">
-                      {Math.round(currentDay.calories).toLocaleString()} kcal
+                      {Math.round(currentDay.calories).toLocaleString()}{" "}
+                      {summary?.calorieTarget ? (
+                        <span className="text-base font-medium text-muted">
+                          / {summary.calorieTarget.toLocaleString()} kcal
+                        </span>
+                      ) : (
+                        "kcal"
+                      )}
                     </p>
                   </div>
                   <div className="flex gap-4 text-center">
