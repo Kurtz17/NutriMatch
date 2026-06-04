@@ -21,7 +21,6 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { href: "/#features", label: "Features", publicOnly: true },
   { href: "/meal-plan", label: "Meal Plan" },
   { href: "/dashboard", label: "Dashboard" },
 ];
@@ -107,31 +106,31 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
       )}
     >
       <div className="app-container flex min-h-16 flex-wrap items-center justify-between gap-3 py-2">
-        <Link href="/" className="flex items-center gap-2 font-bold">
-          <span
-            className={cn(
-              "inline-flex h-9 w-9 items-center justify-center rounded-lg",
-              transparent
-                ? "bg-white/12 text-white ring-1 ring-white/25"
-                : "bg-brand-50 text-brand-700",
-            )}
-          >
-            <Leaf className="h-5 w-5" />
-          </span>
-          <span
-            className={cn("text-lg", transparent ? "text-white" : "text-ink")}
-          >
-            NutriMatch
-          </span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 font-bold">
+            <span
+              className={cn(
+                "inline-flex h-9 w-9 items-center justify-center rounded-lg",
+                transparent
+                  ? "bg-white/12 text-white ring-1 ring-white/25"
+                  : "bg-brand-50 text-brand-700",
+              )}
+            >
+              <Leaf className="h-5 w-5" />
+            </span>
+            <span
+              className={cn("text-lg", transparent ? "text-white" : "text-ink")}
+            >
+              NutriMatch
+            </span>
+          </Link>
+        </div>
 
         <nav className="order-3 flex w-full gap-2 overflow-x-auto text-sm font-semibold md:order-2 md:w-auto md:items-center md:gap-7">
           {visibleNavItems.map((item) => {
             const active =
-              item.href === "/#features"
-                ? false
-                : pathname === item.href ||
-                  (item.href !== "/" && pathname.startsWith(item.href));
+              pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(item.href));
 
             return (
               <Link
@@ -140,9 +139,9 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
                   "shrink-0 rounded-lg px-2.5 py-2 transition md:px-0 md:py-0",
                   linkClass,
                   active &&
-                    (transparent
-                      ? "bg-white/10 text-white md:bg-transparent"
-                      : "bg-brand-50 text-brand-700 md:bg-transparent"),
+                  (transparent
+                    ? "bg-white/10 text-white md:bg-transparent"
+                    : "bg-brand-50 text-brand-700 md:bg-transparent"),
                 )}
                 href={item.href}
               >
