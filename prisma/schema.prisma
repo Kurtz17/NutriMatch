@@ -93,6 +93,7 @@ model Food {
   id       String  @id @default(cuid())
   name     String  @unique
   category String?
+  imageUrl String? @map("image_url")
 
   caloriesPer100g Float  @map("calories_per_100g")
   proteinPer100g  Float  @map("protein_per_100g")
