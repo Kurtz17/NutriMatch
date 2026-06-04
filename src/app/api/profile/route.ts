@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       name,
+      photoUrl,
       age,
       weightKg,
       heightCm,
@@ -100,13 +101,13 @@ export async function POST(request: NextRequest) {
     }
     if (!validActivityLevels.includes(activityLevel)) {
       return NextResponse.json(
-        { error: "Activity level tidak valid" },
+        { error: "Activity Level tidak valid." },
         { status: 400 }
       );
     }
     if (!validHealthGoals.includes(healthGoal)) {
       return NextResponse.json(
-        { error: "Health goal tidak valid" },
+        { error: "Health Goal tidak valid." },
         { status: 400 }
       );
     }
@@ -122,10 +123,13 @@ export async function POST(request: NextRequest) {
 
     const profile = await prisma.$transaction(async (tx) => {
       
-      if (name) {
+      if (name !== undefined || photoUrl !== undefined) {
         await tx.user.update({
           where: { id: user.id },
-          data: { name: name },
+          data: { 
+            ...(name !== undefined ? { name } : {}),
+            ...(photoUrl !== undefined ? { photoUrl } : {}),
+          },
         });
       }
 

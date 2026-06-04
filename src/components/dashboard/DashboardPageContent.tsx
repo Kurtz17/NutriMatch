@@ -178,15 +178,30 @@ export async function DashboardPageContent() {
                   </p>
                 </div>
               </div>
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="mt-5">
                 {allergyLabels.length > 0 ? (
-                  allergyLabels.map((label) => (
-                    <Badge key={label} variant="safe">
-                      {label}
-                    </Badge>
-                  ))
+                  <div className="flex flex-wrap gap-2">
+                    {allergyLabels.map((label) => (
+                      <Badge key={label} variant="safe">
+                        {label}
+                      </Badge>
+                    ))}
+                  </div>
                 ) : (
-                  <Badge variant="neutral">No allergy filters</Badge>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50 px-4 py-3">
+                    <p className="text-sm font-medium text-muted">
+                      No dietary restrictions set.
+                    </p>
+                    <Link
+                      href="/profile"
+                      className={buttonStyles({
+                        variant: "outline",
+                        size: "sm",
+                      })}
+                    >
+                      Update Profile
+                    </Link>
+                  </div>
                 )}
               </div>
             </CardContent>

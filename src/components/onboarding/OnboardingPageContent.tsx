@@ -101,12 +101,30 @@ type ApiProfile = {
   }>;
 };
 
+const englishAllergenNames: Record<string, string> = {
+  dairy: "Dairy",
+  gluten: "Gluten",
+  kacang: "Tree Nuts",
+  nuts: "Tree Nuts",
+  peanut: "Peanuts",
+  kedelai: "Soy",
+  soy: "Soy",
+  seafood: "Seafood",
+  seledri: "Celery",
+  celery: "Celery",
+  telur: "Egg",
+  egg: "Egg",
+  shellfish: "Shellfish",
+  wheat: "Wheat",
+};
+
 function toAllergy(allergen: ApiAllergen): Allergy {
+  const englishName = englishAllergenNames[allergen.slug] || allergen.name;
   return {
     id: allergen.id,
     slug: allergen.slug,
-    label: allergen.name,
-    description: `Avoid foods containing ${allergen.name.toLowerCase()}.`,
+    label: englishName,
+    description: `Avoid foods containing ${englishName.toLowerCase()}.`,
   };
 }
 

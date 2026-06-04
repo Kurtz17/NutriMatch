@@ -16,17 +16,33 @@ export async function GET() {
 
     const email = user.email ?? "";
     const metadataName = user.user_metadata?.name as string | undefined;
+    const metadataPhoto = user.user_metadata?.avatar_url as string | undefined;
+
+    // Sync ID if email matches but ID differs
+    const existingUserByEmail = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+
+    if (existingUserByEmail && existingUserByEmail.id !== user.id) {
+      await prisma.user.update({
+        where: { email },
+        data: { id: user.id },
+      });
+    }
 
     const dbUser = await prisma.user.upsert({
       where: { id: user.id },
       update: {
         email,
         ...(metadataName ? { name: metadataName } : {}),
+        ...(metadataPhoto ? { photoUrl: metadataPhoto } : {}),
       },
       create: {
         id: user.id,
         email,
         name: metadataName,
+        photoUrl: metadataPhoto,
       },
     });
 
@@ -35,6 +51,7 @@ export async function GET() {
         id: dbUser.id,
         email: dbUser.email,
         name: dbUser.name,
+        photoUrl: dbUser.photoUrl,
       },
     });
   } catch (error) {

@@ -11,6 +11,7 @@ type CurrentUser = {
   id: string;
   email: string;
   name: string | null;
+  photoUrl?: string | null;
 };
 
 type NavItem = {
@@ -160,13 +161,17 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
               >
                 <span
                   className={cn(
-                    "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                    "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold overflow-hidden",
                     transparent
                       ? "bg-white text-brand-700"
                       : "bg-brand-500 text-white",
                   )}
                 >
-                  {accountInitial}
+                  {user.photoUrl ? (
+                    <img src={user.photoUrl} alt="Avatar" className="h-full w-full object-cover" />
+                  ) : (
+                    <UserRound className="h-5 w-5 opacity-80" />
+                  )}
                 </span>
                 <span className="hidden min-w-0 leading-tight sm:block">
                   <span className="block max-w-32 truncate text-sm font-bold">
@@ -199,7 +204,14 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
                 <LogOut className="h-4 w-4" />
               </button>
             </div>
-          ) : null}
+          ) : (
+            <Link
+              href="/register"
+              className={buttonStyles({ size: "sm" })}
+            >
+              Get Started
+            </Link>
+          )}
         </div>
       </div>
     </header>

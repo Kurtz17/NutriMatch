@@ -44,8 +44,29 @@ export async function GET(request: NextRequest) {
   }
 
   const { user } = data;
+  const userEmail = user.email ?? "";
 
-   const existingUser = await prisma.user.findUnique({
+  const name =
+    (user.user_metadata?.full_name as string | undefined) ??
+    (user.user_metadata?.name as string | undefined) ??
+    (userEmail.split("@")[0] || "User");
+    
+  const photoUrl = user.user_metadata?.avatar_url as string | undefined;
+
+  // Sync identity if email exists but ID differs
+  const existingUserByEmail = await prisma.user.findUnique({
+    where: { email: userEmail },
+    select: { id: true },
+  });
+
+  if (existingUserByEmail && existingUserByEmail.id !== user.id) {
+    await prisma.user.update({
+      where: { email: userEmail },
+      data: { id: user.id },
+    });
+  }
+
+  const existingUser = existingUserByEmail || await prisma.user.findUnique({
     where: { id: user.id },
     select: { id: true },
   });
@@ -53,52 +74,44 @@ export async function GET(request: NextRequest) {
   if (mode === "login") {
     if (!existingUser) {
       await supabase.auth.signOut();
- 
-      return NextResponse.redirect(
-        `${origin}/login?error=account_not_found`
-      );
+      return NextResponse.redirect(`${origin}/login?error=account_not_found`);
     }
-    const name =
-      (user.user_metadata?.full_name as string | undefined) ??
-      (user.user_metadata?.name as string | undefined);
- 
+
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        email: user.email ?? existingUser.id,
+        email: userEmail,
         ...(name ? { name } : {}),
+        ...(photoUrl ? { photoUrl } : {}),
       },
     });
- 
+
     return NextResponse.redirect(`${origin}/dashboard`);
   }
 
-  const name =
-    (user.user_metadata?.full_name as string | undefined) ??
-    (user.user_metadata?.name as string | undefined) ??
-    (user.email?.split("@")[0] ?? "User");
- 
   await prisma.user.upsert({
     where: { id: user.id },
     update: {
-      email: user.email ?? "",
+      email: userEmail,
       ...(name ? { name } : {}),
+      ...(photoUrl ? { photoUrl } : {}),
     },
     create: {
       id: user.id,
-      email: user.email ?? "",
+      email: userEmail,
       name,
+      photoUrl,
     },
   });
- 
+
   const existingProfile = await prisma.userProfile.findUnique({
     where: { userId: user.id },
     select: { id: true },
   });
- 
+
   const redirectTo = existingProfile
     ? `${origin}/dashboard`
     : `${origin}/onboarding`;
- 
+
   return NextResponse.redirect(redirectTo);
 }
