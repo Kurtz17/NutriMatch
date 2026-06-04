@@ -59,29 +59,29 @@ export const mealPrefOptions: Array<{ key: MealPrefKey; label: string }> = [
 
 export const breakfastCategoryOptions = [
   { value: "berkuah", label: "Berkuah" },
+  { value: "buah", label: "Buah" },
+  { value: "karbohidrat_pokok", label: "Karbohidrat pokok" },
   { value: "lauk_hewani", label: "Lauk hewani" },
-  { value: "lauk_nabati", label: "Lauk nabati" },
   { value: "minuman_susu", label: "Minuman susu" },
   { value: "sayuran", label: "Sayuran" },
+  { value: "snack_dessert", label: "Snack/Dessert" },
 ];
 
 export const breakfastIngredientOptions = [
   { value: "ayam", label: "Ayam" },
   { value: "beras", label: "Beras" },
+  { value: "buah", label: "Buah" },
   { value: "ikan", label: "Ikan" },
-  { value: "kacang", label: "Kacang" },
-  { value: "kedelai", label: "Kedelai" },
-  { value: "sapi", label: "Sapi" },
+  { value: "other", label: "Lainnya" },
   { value: "sayuran", label: "Sayuran" },
   { value: "susu", label: "Susu" },
+  { value: "terigu", label: "Terigu" },
 ];
 
 export const lunchDinnerCategoryOptions = [
   { value: "berkuah", label: "Berkuah" },
-  { value: "gorengan", label: "Gorengan" },
   { value: "karbohidrat_pokok", label: "Karbohidrat pokok" },
   { value: "lauk_hewani", label: "Lauk hewani" },
-  { value: "lauk_nabati", label: "Lauk nabati" },
   { value: "sayuran", label: "Sayuran" },
 ];
 
@@ -89,25 +89,20 @@ export const lunchDinnerIngredientOptions = [
   { value: "ayam", label: "Ayam" },
   { value: "beras", label: "Beras" },
   { value: "ikan", label: "Ikan" },
-  { value: "kacang", label: "Kacang" },
-  { value: "kambing", label: "Kambing" },
-  { value: "kedelai", label: "Kedelai" },
-  { value: "sapi", label: "Sapi" },
+  { value: "other", label: "Lainnya" },
   { value: "sayuran", label: "Sayuran" },
-  { value: "seafood", label: "Seafood" },
-  { value: "singkong", label: "Singkong" },
-  { value: "telur", label: "Telur" },
   { value: "terigu", label: "Terigu" },
 ];
 
 export const categoryToIngredientsMap: Record<string, string[]> = {
-  karbohidrat_pokok: ["beras", "terigu", "singkong"],
-  lauk_hewani: ["ayam", "ikan", "sapi", "kambing", "seafood", "telur"],
-  lauk_nabati: ["kedelai", "kacang"],
-  sayuran: ["sayuran"],
+  berkuah: ["other"],
+  buah: ["buah", "susu"],
+  gorengan: ["terigu"],
+  karbohidrat_pokok: ["ayam", "beras", "terigu"],
+  lauk_hewani: ["ikan", "other"],
   minuman_susu: ["susu"],
-  berkuah: ["ayam", "ikan", "sapi", "kambing", "seafood", "sayuran", "kedelai", "telur"],
-  gorengan: ["ayam", "ikan", "kedelai", "singkong", "terigu", "telur", "sayuran"],
+  sayuran: ["sayuran"],
+  snack_dessert: ["susu"],
 };
 
 export function localIsoDate() {
@@ -188,17 +183,21 @@ export function allergyFlagsFromText(values: string[]) {
   for (const value of values) {
     const text = value.toLowerCase();
 
-    if (text.includes("gluten")) flags.gluten = 1;
+    if (text.includes("gluten") || text.includes("wheat")) flags.gluten = 1;
     if (text.includes("dairy") || text.includes("susu")) flags.dairy = 1;
-    if (text.includes("kacang") || text.includes("nut")) {
-      flags.nuts = 1;
+    
+    // Separate peanut and tree nuts
+    if (text.includes("peanut") || text.includes("kacang tanah")) {
       flags.peanut = 1;
+    } else if (text.includes("nut") || text.includes("kacang")) {
+      flags.nuts = 1;
     }
-    if (text.includes("peanut")) flags.peanut = 1;
+
     if (
       text.includes("seafood") ||
       text.includes("ikan") ||
-      text.includes("udang")
+      text.includes("udang") ||
+      text.includes("shellfish")
     ) {
       flags.seafood = 1;
     }
