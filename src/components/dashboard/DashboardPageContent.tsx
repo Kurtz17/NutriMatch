@@ -103,8 +103,7 @@ export async function DashboardPageContent() {
     title: "Profile-based nutrition target",
     summary: `Your current plan targets ${nutritionSummary.calorieTarget} kcal per day from your saved body metrics and goal.`,
     highlights: [
-      `${allergyLabels.length} allergy filter${
-        allergyLabels.length === 1 ? "" : "s"
+      `${allergyLabels.length} allergy filter${allergyLabels.length === 1 ? "" : "s"
       } active`,
       `${nutritionSummary.bmr} kcal BMR`,
       `${nutritionSummary.tdee} kcal estimated TDEE`,
