@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: "NutriMatch | Allergy-safe personalized nutrition",
   description:
     "Personalized nutrition recommendations and allergy-safe 7-day meal plans.",
+  icons: {
+    icon: "/images/icon.png",
+    shortcut: "/images/icon.png",
+    apple: "/images/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -13,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   );
