@@ -24,9 +24,14 @@ async function main() {
       create: { name: "Seafood", slug: "seafood" },
     }),
     prisma.allergen.upsert({
-      where: { slug: "kacang" },
+      where: { slug: "nuts" },
       update: {},
-      create: { name: "Kacang", slug: "kacang" },
+      create: { name: "Kacang Pohon (Nuts)", slug: "nuts" },
+    }),
+    prisma.allergen.upsert({
+      where: { slug: "peanut" },
+      update: {},
+      create: { name: "Kacang Tanah (Peanut)", slug: "peanut" },
     }),
     prisma.allergen.upsert({
       where: { slug: "gluten" },
@@ -47,6 +52,11 @@ async function main() {
       where: { slug: "kedelai" },
       update: {},
       create: { name: "Kedelai", slug: "kedelai" },
+    }),
+    prisma.allergen.upsert({
+      where: { slug: "celery" },
+      update: {},
+      create: { name: "Seledri", slug: "celery" },
     }),
   ]);
 
@@ -278,7 +288,7 @@ async function main() {
       carbsPer100g: 18.0,
       fatPer100g: 13.0,
       fiberPer100g: 3.0,
-      allergens: ["kedelai", "kacang"],
+      allergens: ["kedelai", "peanut"],
     },
     {
       name: "Tahu Goreng",
@@ -456,7 +466,7 @@ async function main() {
       carbsPer100g: 12.0,
       fatPer100g: 8.0,
       fiberPer100g: 3.0,
-      allergens: ["kacang", "kedelai", "telur"],
+      allergens: ["peanut", "kedelai", "telur"],
     },
     {
       name: "Soto Ayam",
@@ -486,7 +496,7 @@ async function main() {
       carbsPer100g: 8.0,
       fatPer100g: 12.0,
       fiberPer100g: 1.0,
-      allergens: ["seafood", "kacang"],
+      allergens: ["seafood", "peanut"],
     },
     {
       name: "Nasi Padang (Ayam)",

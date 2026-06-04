@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Bean, Egg, Fish, Milk, Nut, Shell, ShieldCheck, Wheat } from "lucide-react";
+import { Bean, Egg, Fish, Leaf, Milk, Nut, Shell, ShieldCheck, Wheat } from "lucide-react";
 import type { Allergy, AllergyId } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,7 @@ const allergyIcons: Record<string, LucideIcon> = {
   soy: Bean,
   shellfish: Shell,
   wheat: Wheat,
+  celery: Leaf,
 };
 
 export function AllergyCard({
