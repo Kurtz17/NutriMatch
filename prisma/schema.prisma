@@ -36,6 +36,7 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
+  photoUrl  String?  @map("photo_url")
   createdAt DateTime @default(now()) @map("created_at")
 
   profile   UserProfile?
@@ -47,7 +48,7 @@ model User {
 model UserProfile {
   id     String @id @default(cuid())
   userId String @unique @map("user_id")
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   age           Int
   weightKg      Float         @map("weight_kg")
@@ -122,7 +123,7 @@ model FoodAllergen {
 model MealPlan {
   id     String @id @default(cuid())
   userId String @map("user_id")
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   startDate      DateTime @map("start_date")
   endDate        DateTime @map("end_date")

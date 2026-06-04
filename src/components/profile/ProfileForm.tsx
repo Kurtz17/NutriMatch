@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { Save } from "lucide-react";
+import { Save, UserRound } from "lucide-react";
 import type { ActivityLevel, Allergy, AllergyId, DietGoal, Gender, UserProfile } from "@/types";
 import { ActivityCard } from "@/components/profile/ActivityCard";
 import { AllergyCard } from "@/components/profile/AllergyCard";
@@ -20,6 +20,7 @@ import {
   RECOMMENDATION_PAYLOAD_STORAGE_KEY,
   type RecommendationPayload,
 } from "@/lib/recommendationPayload";
+import { createClient } from "@/lib/supabase/client";
 
 const activityLevels: ActivityLevel[] = [
   "Sedentary",
@@ -31,6 +32,7 @@ const goals: DietGoal[] = ["Lose weight", "Maintain weight", "Gain weight"];
 const genders: Gender[] = ["Female", "Male"];
 
 type EditableProfile = Omit<UserProfile, "age" | "heightCm" | "weightKg"> & {
+  photoUrl?: string | null;
   age: number | "";
   heightCm: number | "";
   weightKg: number | "";
@@ -39,6 +41,7 @@ type EditableProfile = Omit<UserProfile, "age" | "heightCm" | "weightKg"> & {
 const defaultProfile: EditableProfile = {
   name: "",
   email: "",
+  photoUrl: "",
   age: 25,
   gender: "Female",
   heightCm: 165,
@@ -103,18 +106,37 @@ type ApiProfile = {
   user: {
     email: string;
     name: string | null;
+    photoUrl?: string | null;
   };
   allergies: Array<{
     allergen: ApiAllergen;
   }>;
 };
 
+const englishAllergenNames: Record<string, string> = {
+  dairy: "Dairy",
+  gluten: "Gluten",
+  kacang: "Tree Nuts",
+  nuts: "Tree Nuts",
+  peanut: "Peanuts",
+  kedelai: "Soy",
+  soy: "Soy",
+  seafood: "Seafood",
+  seledri: "Celery",
+  celery: "Celery",
+  telur: "Egg",
+  egg: "Egg",
+  shellfish: "Shellfish",
+  wheat: "Wheat",
+};
+
 function toAllergy(allergen: ApiAllergen): Allergy {
+  const englishName = englishAllergenNames[allergen.slug] || allergen.name;
   return {
     id: allergen.id,
     slug: allergen.slug,
-    label: allergen.name,
-    description: `Avoid foods containing ${allergen.name.toLowerCase()}.`,
+    label: englishName,
+    description: `Avoid foods containing ${englishName.toLowerCase()}.`,
   };
 }
 
@@ -136,6 +158,8 @@ export function ProfileForm() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -170,6 +194,7 @@ export function ProfileForm() {
           ...current,
           name: meData.user?.name ?? "",
           email: meData.user?.email ?? "",
+          photoUrl: meData.user?.photoUrl ?? "",
         }));
 
         if (profileResponse.ok) {
@@ -185,6 +210,7 @@ export function ProfileForm() {
           setProfile({
             name: savedProfile.user.name ?? "",
             email: savedProfile.user.email,
+            photoUrl: savedProfile.user.photoUrl ?? "",
             age: savedProfile.age,
             gender: genderFromApi[savedProfile.gender] ?? "Female",
             heightCm: savedProfile.heightCm,
@@ -294,6 +320,29 @@ export function ProfileForm() {
     setIsSaving(true);
 
     try {
+      let finalPhotoUrl = profile.photoUrl;
+
+      if (photoFile) {
+        const supabase = createClient();
+        const fileExt = photoFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${profile.email}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, photoFile, { upsert: true });
+
+        if (uploadError) {
+          throw new Error("Gagal mengunggah foto. Pastikan Anda telah membuat bucket 'avatars' dengan akses Public di Supabase.");
+        }
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+
+        finalPhotoUrl = publicUrl;
+      }
+
       const response = await fetch("/api/profile", {
         method: "POST",
         headers: {
@@ -301,6 +350,7 @@ export function ProfileForm() {
         },
         body: JSON.stringify({
           name: profile.name,
+          photoUrl: finalPhotoUrl || null,
           age: Number(profile.age),
           weightKg: Number(profile.weightKg),
           heightCm: Number(profile.heightCm),
@@ -334,9 +384,26 @@ export function ProfileForm() {
         JSON.stringify(payloadToSave),
       );
       setRecommendationPayload(payloadToSave);
+      
+      if (photoFile) {
+        setProfile(current => ({ ...current, photoUrl: finalPhotoUrl }));
+        setPhotoFile(null);
+      }
+      
       setStatus("Profil berhasil disimpan.");
-    } catch {
-      setError("Tidak bisa menghubungi server. Coba jalankan ulang aplikasinya.");
+
+      // If photo was changed, reload the page after a short delay to sync the Navbar avatar
+      if (photoFile) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+      }
+    } catch (caughtError) {
+      if (caughtError instanceof Error) {
+        setError(caughtError.message);
+      } else {
+        setError("Tidak bisa menghubungi server. Coba jalankan ulang aplikasinya.");
+      }
     } finally {
       setIsSaving(false);
     }
@@ -386,11 +453,53 @@ export function ProfileForm() {
         <>
           <Card>
             <CardContent>
-              <div className="mb-6">
-                <p className="text-sm font-semibold text-brand-700">Profile</p>
-                <h2 className="mt-1 text-xl font-bold text-ink">
-                  Personal information
-                </h2>
+              <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-brand-700">Profile</p>
+                  <h2 className="mt-1 text-xl font-bold text-ink">
+                    Personal information
+                  </h2>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100 border border-slate-200">
+                    {(photoPreview || profile.photoUrl) ? (
+                      <img 
+                        src={photoPreview || profile.photoUrl || ""} 
+                        alt="Preview" 
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-slate-400">
+                        <UserRound className="h-8 w-8" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="avatar-upload"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setPhotoFile(file);
+                          setPhotoPreview(URL.createObjectURL(file));
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor="avatar-upload"
+                      className="cursor-pointer inline-flex rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition"
+                    >
+                      Change photo
+                    </label>
+                    <p className="mt-1 text-xs text-slate-500">
+                      JPG, PNG, WebP up to 2MB.
+                    </p>
+                  </div>
+                </div>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <Input
@@ -402,6 +511,7 @@ export function ProfileForm() {
                   required
                 />
                 <Input label="Email" value={profile.email} readOnly />
+
                 <Input
                   label="Age"
                   type="number"
