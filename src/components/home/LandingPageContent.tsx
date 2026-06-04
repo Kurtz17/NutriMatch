@@ -253,10 +253,43 @@ export function LandingPageContent() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 py-8">
-        <div className="app-container flex flex-col justify-between gap-3 text-sm text-muted sm:flex-row sm:items-center">
-          <p className="font-semibold text-ink">NutriMatch</p>
-          <p>Allergy-aware meal planning for saved user profiles.</p>
+      <footer className="bg-slate-950 py-16 lg:py-20">
+        <div className="app-container grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+          <div className="lg:col-span-2">
+            <Link href="/" className="flex items-center gap-2 font-bold">
+              <img 
+                src="/images/icon.png" 
+                alt="NutriMatch Icon" 
+                className="h-10 w-10 object-contain drop-shadow-sm" 
+              />
+              <span className="text-2xl tracking-tight text-white">
+                NutriMatch
+              </span>
+            </Link>
+            <p className="mt-6 max-w-sm text-base leading-7 text-slate-400">
+              NutriMatch connects your personal profile and allergy preferences to generate safe, personalized weekly meal plans.
+            </p>
+          </div>
+          <div>
+            <p className="font-semibold text-white">Product</p>
+            <ul className="mt-6 space-y-4 text-sm text-slate-400">
+              <li><Link href="/meal-plan" className="hover:text-emerald-400 transition-colors">Meal Plan</Link></li>
+              <li><Link href="/dashboard" className="hover:text-emerald-400 transition-colors">Dashboard</Link></li>
+              <li><Link href="/profile" className="hover:text-emerald-400 transition-colors">Profile Setup</Link></li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold text-white">Company</p>
+            <ul className="mt-6 space-y-4 text-sm text-slate-400">
+              <li><Link href="#" className="hover:text-emerald-400 transition-colors">About Us</Link></li>
+              <li><Link href="#" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link></li>
+              <li><Link href="#" className="hover:text-emerald-400 transition-colors">Terms of Service</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="app-container mt-16 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 sm:flex-row text-sm text-slate-500">
+          <p>© {new Date().getFullYear()} NutriMatch. All rights reserved.</p>
+          <p>Built for allergy-aware nutrition.</p>
         </div>
       </footer>
     </div>

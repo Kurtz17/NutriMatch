@@ -115,23 +115,6 @@ export function LoginPageContent() {
                 </p>
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="w-full"
-                onClick={handleGoogleLogin}
-                disabled={isAnyLoading}
-              >
-                <GoogleIcon />
-                {isGoogleLoading ? "Mengarahkan ke Google..." : "Continue with Google"}
-              </Button>
-
-              <div className="my-5 flex items-center gap-3">
-                <div className="h-px flex-1 bg-slate-200" />
-                <span className="text-xs font-semibold text-slate-400">OR</span>
-                <div className="h-px flex-1 bg-slate-200" />
-              </div>
 
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <Input
@@ -179,6 +162,24 @@ export function LoginPageContent() {
                   {isSubmitting ? "Logging in..." : "Login"}
                 </Button>
               </form>
+
+              <div className="my-5 flex items-center gap-3">
+                <div className="h-px flex-1 bg-slate-200" />
+                <span className="text-xs font-semibold text-slate-400">OR</span>
+                <div className="h-px flex-1 bg-slate-200" />
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full"
+                onClick={handleGoogleLogin}
+                disabled={isAnyLoading}
+              >
+                <GoogleIcon />
+                {isGoogleLoading ? "Mengarahkan ke Google..." : "Continue with Google"}
+              </Button>
 
               <p className="mt-6 text-center text-sm text-muted">
                 New to NutriMatch?{" "}
