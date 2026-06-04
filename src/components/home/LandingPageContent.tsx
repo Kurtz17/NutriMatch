@@ -5,92 +5,152 @@ import {
   CalendarDays,
   ChartPie,
   ClipboardList,
+  Lock,
   ShieldCheck,
   Sparkles,
-  Utensils,
+  Target,
+  Check,
+  Zap,
+  Globe,
+  Mail,
+  MessageCircle,
+  Heart,
 } from "lucide-react";
-import { FeatureCard } from "@/components/home/FeatureCard";
 import { Navbar } from "@/components/layout/Navbar";
-import { Badge } from "@/components/ui/Badge";
+import { HeroDashboardPreview } from "@/components/home/HeroDashboardPreview";
+import { DashboardPreviewSection } from "@/components/home/DashboardPreviewSection";
 import { buttonStyles } from "@/components/ui/Button";
 
-const sampleNutritionSummary = {
-  calorieTarget: 1900,
-  macros: [
-    { label: "Protein", percentage: 25, color: "#16a34a" },
-    { label: "Carbs", percentage: 45, color: "#2563eb" },
-    { label: "Fat", percentage: 30, color: "#f59e0b" },
-  ],
-};
+/* ------------------------------------------------------------------ */
+/*  Static data                                                        */
+/* ------------------------------------------------------------------ */
+
+const trustBadges = [
+  { icon: ShieldCheck, label: "Allergy-aware" },
+  { icon: Target, label: "Profile-based" },
+  { icon: Sparkles, label: "Science-backed" },
+  { icon: Lock, label: "Privacy-first" },
+];
+
+const statCards = [
+  {
+    icon: ChartPie,
+    title: "Target Calories",
+    value: "1900",
+    unit: "kcal",
+    sub: "Example daily target",
+    accent: "border-emerald-200 bg-white",
+  },
+  {
+    icon: Calculator,
+    title: "Smart Personalization",
+    value: "100%",
+    unit: "Custom",
+    sub: "Tailored to your profile, allergies, and activity",
+    accent: "bg-brand-50",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Allergy-Aware Planning",
+    value: "",
+    unit: "",
+    sub: "Excludes unsafe foods and recommends safe, delicious alternatives.",
+    accent: "bg-white",
+  },
+  {
+    icon: Zap,
+    title: "Quick & Easy Setup",
+    value: "",
+    unit: "",
+    sub: "Get your first personalized meal plan in just a few simple steps.",
+    accent: "bg-white",
+  },
+];
 
 const features = [
   {
     icon: ClipboardList,
-    title: "Guided profile setup",
-    description:
-      "Collect body metrics, activity level, diet goal, and allergy filters in one focused flow.",
+    title: "Guided Profile Setup",
+    description: "Collect body metrics, activity level, diet goal, and allergy filters in one focused flow.",
   },
   {
     icon: Calculator,
-    title: "BMR, TDEE, and target calories",
-    description:
-      "Turn profile data into clear daily energy targets that drive every recommendation.",
+    title: "BMR, TDEE & Targets",
+    description: "Turn profile data into clear daily energy targets that drive every recommendation.",
   },
   {
     icon: ShieldCheck,
-    title: "Allergy-aware filtering",
-    description:
-      "Exclude foods connected to selected allergens before building the weekly plan.",
+    title: "Allergy-Aware Filtering",
+    description: "Exclude foods connected to selected allergens before building the weekly plan.",
   },
   {
     icon: CalendarDays,
-    title: "7-day generated meal plan",
-    description:
-      "Generate breakfast, lunch, dinner, and snack options from saved profile data.",
+    title: "7-Day Meal Plan",
+    description: "Generate breakfast, lunch, dinner, and snack options from your saved profile data.",
   },
   {
     icon: Sparkles,
-    title: "Readable nutrition context",
-    description:
-      "Show why targets and recommendations fit the user's profile without burying the signal.",
+    title: "Readable Nutrition",
+    description: "Show why targets and recommendations fit the user's profile without the noise.",
+  },
+  {
+    icon: ChartPie,
+    title: "Plan Review Dashboard",
+    description: "Review targets, allergies, meal previews, and nutrition summaries in one clean dashboard.",
   },
 ];
 
 const workflow = [
   {
     number: "1",
-    title: "Create account",
-    description: "Register or login so the profile belongs to the active user.",
+    title: "Create Account",
+    description: "Register or log in to save your profile and get started.",
+    color: "bg-emerald-500",
   },
   {
     number: "2",
-    title: "Save profile",
-    description: "Fill body metrics, activity, goal, and allergy preferences.",
+    title: "Save Your Profile",
+    description: "Fill in body metrics, activity, goals, and allergy preferences.",
+    color: "bg-brand-500",
   },
   {
     number: "3",
-    title: "Generate plan",
-    description: "Build a weekly plan from foods that pass the allergy filter.",
+    title: "Generate Your Plan",
+    description: "Build a weekly plan from safe foods that match your profile.",
+    color: "bg-emerald-600",
   },
 ];
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
 
 export function LandingPageContent() {
   return (
     <div className="bg-white">
-      <Navbar transparent />
+      <Navbar />
 
-      <section className="hero-food-bg relative min-h-[92vh] overflow-hidden">
-        <div className="app-container flex min-h-[92vh] flex-col justify-end pb-10 pt-32">
-          <div className="max-w-3xl text-white">
-            <Badge className="bg-white/15 text-white ring-white/20" variant="neutral">
-              Allergy-aware nutrition planning
-            </Badge>
-            <h1 className="mt-5 text-4xl font-bold tracking-normal sm:text-5xl lg:text-6xl">
-              Build Safer Meal Plans From Your Real Profile
+      {/* ============================================================= */}
+      {/* HERO                                                           */}
+      {/* ============================================================= */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50 pt-12 pb-16 sm:pt-20 sm:pb-24">
+        {/* Decorative blobs */}
+        <div className="hero-gradient-blob -top-32 -left-32 h-96 w-96 bg-emerald-400" />
+        <div className="hero-gradient-blob -right-20 top-20 h-72 w-72 bg-sky-300" />
+
+        <div className="app-container relative z-10 grid items-center gap-10 lg:grid-cols-2">
+          {/* Left */}
+          <div className="animate-fade-in-up max-w-xl">
+            <h1 className="text-4xl font-bold leading-[1.15] tracking-tight text-ink sm:text-5xl">
+              Safer Meal Plans{" "}
+              <span className="text-brand-500">
+                Built Around Your Real Nutrition Profile
+              </span>
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
-              NutriMatch connects auth, nutrition profile data, allergy
-              preferences, and weekly recommendations in one practical flow.
+            <p className="mt-5 max-w-md text-base leading-7 text-muted">
+              NutriMatch connects your profile, nutrition data, and allergy
+              preferences to generate safe, personalized weekly meal plans you
+              can trust—every time.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/register" className={buttonStyles({ size: "lg" })}>
@@ -98,122 +158,96 @@ export function LandingPageContent() {
               </Link>
               <Link
                 href="/dashboard"
-                className={buttonStyles({
-                  variant: "outline",
-                  size: "lg",
-                  className:
-                    "border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white hover:text-ink",
-                })}
+                className={buttonStyles({ variant: "outline", size: "lg" })}
               >
-                Go to Dashboard
+                View Dashboard
               </Link>
             </div>
+            {/* Trust badges */}
+            <div className="mt-8 flex flex-wrap gap-4">
+              {trustBadges.map((badge) => (
+                <div
+                  key={badge.label}
+                  className="flex items-center gap-1.5 text-sm font-medium text-muted"
+                >
+                  <badge.icon className="h-4 w-4 text-brand-500" />
+                  {badge.label}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-10 grid gap-3 rounded-lg border border-white/20 bg-white/90 p-3 shadow-soft backdrop-blur md:grid-cols-3">
-            <div className="flex min-h-40 flex-col justify-between rounded-lg border border-emerald-200 bg-white p-5 text-ink shadow-card">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-brand-700">
-                    Example daily target
-                  </p>
-                  <p className="mt-1 text-3xl font-bold">
-                    {sampleNutritionSummary.calorieTarget}
-                    <span className="ml-1 text-sm font-semibold text-muted">
-                      kcal
-                    </span>
-                  </p>
-                </div>
-                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-700">
-                  <ChartPie className="h-7 w-7" />
-                </span>
-              </div>
-              <div className="mt-6 flex overflow-hidden rounded-full bg-slate-200">
-                {sampleNutritionSummary.macros.map((macro) => (
-                  <span
-                    key={macro.label}
-                    className="h-3"
-                    style={{
-                      width: `${macro.percentage}%`,
-                      backgroundColor: macro.color,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="flex min-h-40 flex-col justify-between rounded-lg bg-brand-50 p-5">
-              <p className="text-sm font-semibold text-brand-700">
-                Profile-driven filtering
-              </p>
-              <div>
-                <p className="text-3xl font-bold text-ink">Auth + DB</p>
-                <p className="mt-3 text-xs leading-5 text-muted">
-                  User, profile, allergens, and plans are saved through API
-                  routes.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex min-h-40 flex-col justify-between rounded-lg bg-white p-5">
-              <p className="text-sm font-semibold text-muted">Next action</p>
-              <div>
-                <p className="font-bold text-ink">Complete onboarding</p>
-                <p className="mt-3 text-xs leading-5 text-muted">
-                  Save your measurements and allergy preferences before
-                  generating meals.
-                </p>
-              </div>
-            </div>
+          {/* Right — Dashboard preview card */}
+          <div className="animate-fade-in-up animate-delay-200 hidden md:block">
+            <HeroDashboardPreview />
           </div>
         </div>
       </section>
 
+      {/* ============================================================= */}
+      {/* STAT CARDS BAR                                                 */}
+      {/* ============================================================= */}
+      <section className="relative z-10 -mt-8">
+        <div className="app-container">
+          <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft sm:grid-cols-2 lg:grid-cols-4">
+            {statCards.map((card) => (
+              <div
+                key={card.title}
+                className={`flex flex-col justify-between rounded-xl border border-slate-100 p-5 ${card.accent}`}
+              >
+                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
+                  <card.icon className="h-5 w-5" />
+                </span>
+                <p className="text-sm font-bold text-muted">{card.title}</p>
+                {card.value && (
+                  <p className="mt-1 text-2xl font-bold text-ink">
+                    {card.value}
+                    {card.unit && (
+                      <span className="ml-1 text-sm font-semibold text-muted">
+                        {card.unit}
+                      </span>
+                    )}
+                  </p>
+                )}
+                <p className="mt-2 text-xs leading-5 text-muted">{card.sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================= */}
+      {/* POWERFUL FEATURES                                              */}
+      {/* ============================================================= */}
       <section id="features" className="py-16 sm:py-20">
         <div className="app-container">
-          <div className="max-w-2xl">
+          <div className="mx-auto max-w-2xl text-center">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-700">
-              Product features
+              Powerful Features
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-normal text-ink sm:text-4xl">
-              Useful screens for the real recommendation flow
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+              Everything you need for safe, personalized nutrition
             </h2>
             <p className="mt-4 text-base leading-7 text-muted">
-              The app now follows the same path a user needs: account, profile,
-              nutrition summary, allergy-safe meal generation, and plan review.
+              From profile setup to weekly plans, NutriMatch makes healthy eating
+              simple, safe, and tailored to you.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
-              <FeatureCard key={feature.title} {...feature} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-brand-50 py-16">
-        <div className="app-container grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-          <div>
-            <Badge variant="safe">Connected recommendation flow</Badge>
-            <h2 className="mt-4 text-3xl font-bold tracking-normal text-ink">
-              From profile to weekly plan in three steps
-            </h2>
-            <p className="mt-4 text-base leading-7 text-slate-700">
-              NutriMatch stores auth, profile, allergy preferences, and
-              generated meal plans through the application API, so each page
-              reflects the active account.
-            </p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {workflow.map((item) => (
-              <div key={item.title} className="rounded-lg bg-white p-5 shadow-card">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white">
-                  {item.number}
+              <div
+                key={feature.title}
+                className="group rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-200 hover:shadow-card"
+              >
+                <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-700 transition group-hover:bg-brand-500 group-hover:text-white">
+                  <feature.icon className="h-5 w-5" />
                 </span>
-                <p className="mt-4 font-bold text-ink">{item.title}</p>
+                <h3 className="text-base font-bold text-ink">
+                  {feature.title}
+                </h3>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  {item.description}
+                  {feature.description}
                 </p>
               </div>
             ))}
@@ -221,31 +255,38 @@ export function LandingPageContent() {
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="app-container grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-          <div>
+      {/* ============================================================= */}
+      {/* HOW IT WORKS                                                   */}
+      {/* ============================================================= */}
+      <section className="bg-slate-50 py-16 sm:py-20">
+        <div className="app-container">
+          <div className="mx-auto max-w-2xl text-center">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-700">
-              Dashboard ready
+              How It Works
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-normal text-ink">
-              Review targets before generating meals
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+              From profile to weekly plan in 3 simple steps
             </h2>
             <p className="mt-4 text-base leading-7 text-muted">
-              The dashboard highlights BMR, TDEE, target calories, allergy
-              filters, and latest meal plan previews for the logged-in account.
+              NutriMatch uses your profile, preferences, and health data to
+              build plans that fit your life and keep you safe.
             </p>
           </div>
-          <div className="grid gap-3 md:grid-cols-3">
-            {[
-              ["BMR/TDEE", "Calculated from saved measurements"],
-              ["Allergies", "Filters applied before meal selection"],
-              ["Plan preview", "Latest generated meals surfaced quickly"],
-            ].map(([title, description]) => (
-              <div key={title} className="rounded-lg border border-slate-200 bg-white p-5">
-                <Utensils className="h-5 w-5 text-brand-700" />
-                <p className="mt-4 font-bold text-ink">{title}</p>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
+            {workflow.map((step) => (
+              <div
+                key={step.number}
+                className="relative rounded-xl bg-white p-6 text-center shadow-card"
+              >
+                <span
+                  className={`mx-auto mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold text-white ${step.color}`}
+                >
+                  {step.number}
+                </span>
+                <h3 className="text-base font-bold text-ink">{step.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  {description}
+                  {step.description}
                 </p>
               </div>
             ))}
@@ -253,6 +294,16 @@ export function LandingPageContent() {
         </div>
       </section>
 
+      {/* ============================================================= */}
+      {/* DASHBOARD PREVIEW (functional cards)                           */}
+      {/* ============================================================= */}
+      <DashboardPreviewSection />
+
+
+
+      {/* ============================================================= */}
+      {/* FOOTER                                                         */}
+      {/* ============================================================= */}
       <footer className="bg-slate-950 py-16 lg:py-20">
         <div className="app-container grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
@@ -266,28 +317,43 @@ export function LandingPageContent() {
                 NutriMatch
               </span>
             </Link>
-            <p className="mt-6 max-w-sm text-base leading-7 text-slate-400">
-              NutriMatch connects your personal profile and allergy preferences to generate safe, personalized weekly meal plans.
+            <p className="mt-4 max-w-sm text-sm leading-7 text-slate-400">
+              NutriMatch connects your personal profile and allergy preferences
+              to generate safe, personalized weekly meal plans you can trust.
             </p>
+            {/* Social icons */}
+            <div className="mt-5 flex gap-3">
+              {[Globe, Mail, MessageCircle, Heart].map((Icon, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-slate-400 transition hover:bg-emerald-600 hover:text-white"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              ))}
+            </div>
           </div>
           <div>
             <p className="font-semibold text-white">Product</p>
-            <ul className="mt-6 space-y-4 text-sm text-slate-400">
-              <li><Link href="/meal-plan" className="hover:text-emerald-400 transition-colors">Meal Plan</Link></li>
-              <li><Link href="/dashboard" className="hover:text-emerald-400 transition-colors">Dashboard</Link></li>
-              <li><Link href="/profile" className="hover:text-emerald-400 transition-colors">Profile Setup</Link></li>
+            <ul className="mt-5 space-y-3 text-sm text-slate-400">
+              <li><Link href="/meal-plan" className="transition hover:text-emerald-400">Meal Plan</Link></li>
+              <li><Link href="/dashboard" className="transition hover:text-emerald-400">Dashboard</Link></li>
+              <li><Link href="/profile" className="transition hover:text-emerald-400">Profile Setup</Link></li>
+              <li><Link href="#features" className="transition hover:text-emerald-400">Features</Link></li>
             </ul>
           </div>
           <div>
             <p className="font-semibold text-white">Company</p>
-            <ul className="mt-6 space-y-4 text-sm text-slate-400">
-              <li><Link href="#" className="hover:text-emerald-400 transition-colors">About Us</Link></li>
-              <li><Link href="#" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link></li>
-              <li><Link href="#" className="hover:text-emerald-400 transition-colors">Terms of Service</Link></li>
+            <ul className="mt-5 space-y-3 text-sm text-slate-400">
+              <li><Link href="#" className="transition hover:text-emerald-400">About Us</Link></li>
+              <li><Link href="#" className="transition hover:text-emerald-400">Privacy Policy</Link></li>
+              <li><Link href="#" className="transition hover:text-emerald-400">Terms of Service</Link></li>
+              <li><Link href="#" className="transition hover:text-emerald-400">Contact</Link></li>
             </ul>
           </div>
         </div>
-        <div className="app-container mt-16 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 sm:flex-row text-sm text-slate-500">
+        <div className="app-container mt-14 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 text-sm text-slate-500 sm:flex-row">
           <p>© {new Date().getFullYear()} NutriMatch. All rights reserved.</p>
           <p>Built for allergy-aware nutrition.</p>
         </div>
