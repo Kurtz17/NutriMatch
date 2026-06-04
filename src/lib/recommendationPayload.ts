@@ -57,31 +57,58 @@ export const mealPrefOptions: Array<{ key: MealPrefKey; label: string }> = [
   { key: "dinner_prefs", label: "Dinner" },
 ];
 
-export const foodCategoryOptions = [
+export const breakfastCategoryOptions = [
   { value: "berkuah", label: "Berkuah" },
-  { value: "tumis", label: "Tumis" },
-  { value: "gorengan", label: "Gorengan" },
   { value: "lauk_hewani", label: "Lauk hewani" },
   { value: "lauk_nabati", label: "Lauk nabati" },
-  { value: "karbohidrat_pokok", label: "Karbohidrat pokok" },
+  { value: "minuman_susu", label: "Minuman susu" },
   { value: "sayuran", label: "Sayuran" },
-  { value: "buah", label: "Buah" },
-  { value: "snack_dessert", label: "Snack / dessert" },
-  { value: "minuman", label: "Minuman" },
 ];
 
-export const mainIngredientOptions = [
+export const breakfastIngredientOptions = [
   { value: "ayam", label: "Ayam" },
-  { value: "ikan", label: "Ikan" },
-  { value: "sapi", label: "Sapi" },
-  { value: "telur", label: "Telur" },
   { value: "beras", label: "Beras" },
-  { value: "gandum", label: "Gandum" },
-  { value: "umbi", label: "Umbi" },
-  { value: "sayuran", label: "Sayuran" },
-  { value: "kedelai", label: "Kedelai" },
+  { value: "ikan", label: "Ikan" },
   { value: "kacang", label: "Kacang" },
+  { value: "kedelai", label: "Kedelai" },
+  { value: "sapi", label: "Sapi" },
+  { value: "sayuran", label: "Sayuran" },
+  { value: "susu", label: "Susu" },
 ];
+
+export const lunchDinnerCategoryOptions = [
+  { value: "berkuah", label: "Berkuah" },
+  { value: "gorengan", label: "Gorengan" },
+  { value: "karbohidrat_pokok", label: "Karbohidrat pokok" },
+  { value: "lauk_hewani", label: "Lauk hewani" },
+  { value: "lauk_nabati", label: "Lauk nabati" },
+  { value: "sayuran", label: "Sayuran" },
+];
+
+export const lunchDinnerIngredientOptions = [
+  { value: "ayam", label: "Ayam" },
+  { value: "beras", label: "Beras" },
+  { value: "ikan", label: "Ikan" },
+  { value: "kacang", label: "Kacang" },
+  { value: "kambing", label: "Kambing" },
+  { value: "kedelai", label: "Kedelai" },
+  { value: "sapi", label: "Sapi" },
+  { value: "sayuran", label: "Sayuran" },
+  { value: "seafood", label: "Seafood" },
+  { value: "singkong", label: "Singkong" },
+  { value: "telur", label: "Telur" },
+  { value: "terigu", label: "Terigu" },
+];
+
+export const categoryToIngredientsMap: Record<string, string[]> = {
+  karbohidrat_pokok: ["beras", "terigu", "singkong"],
+  lauk_hewani: ["ayam", "ikan", "sapi", "kambing", "seafood", "telur"],
+  lauk_nabati: ["kedelai", "kacang"],
+  sayuran: ["sayuran"],
+  minuman_susu: ["susu"],
+  berkuah: ["ayam", "ikan", "sapi", "kambing", "seafood", "sayuran", "kedelai", "telur"],
+  gorengan: ["ayam", "ikan", "kedelai", "singkong", "terigu", "telur", "sayuran"],
+};
 
 export function localIsoDate() {
   const date = new Date();
@@ -98,6 +125,37 @@ export function macroDefaults(calories: number) {
     fat_g: Math.round((safeCalories * 0.3) / 9),
     carb_g: Math.round((safeCalories * 0.45) / 4),
   };
+}
+
+export function calculateTargetCalories(
+  age: number,
+  weightKg: number,
+  heightCm: number,
+  gender: "Female" | "Male" | "Prefer not to say" | string,
+  activityLevel: "Sedentary" | "Light" | "Moderate" | "Active" | "Very Active" | string,
+  dietGoal: "Lose weight" | "Maintain weight" | "Gain weight" | string
+): number {
+  if (!age || !weightKg || !heightCm) return 1800;
+  
+  // BMR Calculation (Mifflin-St Jeor)
+  const isMale = gender === "Male";
+  const bmr = isMale
+    ? 10 * weightKg + 6.25 * heightCm - 5 * age + 5
+    : 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+
+  // Activity Multiplier
+  let multiplier = 1.2; // Sedentary
+  if (activityLevel === "Light") multiplier = 1.375;
+  else if (activityLevel === "Moderate") multiplier = 1.55;
+  else if (activityLevel === "Very Active" || activityLevel === "Active") multiplier = 1.725;
+
+  let tdee = bmr * multiplier;
+
+  // Diet Goal Adjustment
+  if (dietGoal === "Lose weight") tdee -= 500;
+  else if (dietGoal === "Gain weight") tdee += 500;
+
+  return Math.max(Math.round(tdee), 1200); // Minimum 1200 calories
 }
 
 export function emptyAllergyFlags(): Record<AllergyKey, 0 | 1> {
@@ -176,9 +234,7 @@ export function createRecommendationPayload({
       food_category: [],
       main_ingredients: [],
     },
-    user_text:
-      current?.user_text ??
-      "Saya mau makan yang berkuah dan ada ayamnya di siang hari",
+    user_text: current?.user_text ?? "",
     start_date: localIsoDate(),
     days: current?.days ?? 7,
     variety_penalty: current?.variety_penalty ?? 0.15,
@@ -241,34 +297,39 @@ export function parseStoredRecommendationPayload(raw: string | null) {
       breakfast_prefs: {
         food_category: filterDatasetValues(
           normalizeStringList(parsed.breakfast_prefs?.food_category),
-          foodCategoryOptions,
+          breakfastCategoryOptions,
         ),
         main_ingredients: filterDatasetValues(
           normalizeStringList(parsed.breakfast_prefs?.main_ingredients),
-          mainIngredientOptions,
+          breakfastIngredientOptions,
         ),
       },
       lunch_prefs: {
         food_category: filterDatasetValues(
           normalizeStringList(parsed.lunch_prefs?.food_category),
-          foodCategoryOptions,
+          lunchDinnerCategoryOptions,
         ),
         main_ingredients: filterDatasetValues(
           normalizeStringList(parsed.lunch_prefs?.main_ingredients),
-          mainIngredientOptions,
+          lunchDinnerIngredientOptions,
         ),
       },
       dinner_prefs: {
         food_category: filterDatasetValues(
           normalizeStringList(parsed.dinner_prefs?.food_category),
-          foodCategoryOptions,
+          lunchDinnerCategoryOptions,
         ),
         main_ingredients: filterDatasetValues(
           normalizeStringList(parsed.dinner_prefs?.main_ingredients),
-          mainIngredientOptions,
+          lunchDinnerIngredientOptions,
         ),
       },
-      user_text: parsed.user_text || defaults.user_text,
+      user_text:
+        typeof parsed.user_text === "string" &&
+        parsed.user_text !==
+          "Saya mau makan yang berkuah dan ada ayamnya di siang hari"
+          ? parsed.user_text
+          : defaults.user_text,
       start_date:
         typeof parsed.start_date === "string" && parsed.start_date
           ? parsed.start_date

@@ -6,8 +6,11 @@ import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
 import {
   allergyOptions,
-  foodCategoryOptions,
-  mainIngredientOptions,
+  breakfastCategoryOptions,
+  breakfastIngredientOptions,
+  categoryToIngredientsMap,
+  lunchDinnerCategoryOptions,
+  lunchDinnerIngredientOptions,
   mealPrefOptions,
   type MealPrefKey,
   type RecommendationPayload,
@@ -37,11 +40,8 @@ function MultiSelectDropdown({
   const selectedLabels = selectedOptions.map((option) => option.label);
 
   function toggleValue(value: string) {
-    onChange(
-      values.includes(value)
-        ? values.filter((item) => item !== value)
-        : [...values, value],
-    );
+    onChange([value]);
+    setOpen(false);
   }
 
   return (
@@ -76,7 +76,10 @@ function MultiSelectDropdown({
         <div className="absolute z-30 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white p-2 shadow-card">
           <button
             type="button"
-            onClick={() => onChange([])}
+            onClick={() => {
+              onChange([]);
+              setOpen(false);
+            }}
             className="mb-1 flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-slate-500 hover:bg-slate-50"
           >
             <X className="h-4 w-4" />
@@ -142,6 +145,30 @@ export function RecommendationPayloadCard({
     });
   }
 
+  function handleCategoryChange(mealKey: MealPrefKey, values: string[]) {
+    const newCategory = values[0];
+    const currentIngredient = payload[mealKey].main_ingredients[0];
+
+    let newIngredients = payload[mealKey].main_ingredients;
+    if (
+      newCategory &&
+      currentIngredient &&
+      categoryToIngredientsMap[newCategory] &&
+      !categoryToIngredientsMap[newCategory].includes(currentIngredient)
+    ) {
+      newIngredients = [];
+    }
+
+    onChange({
+      ...payload,
+      [mealKey]: {
+        ...payload[mealKey],
+        food_category: values,
+        main_ingredients: newIngredients,
+      },
+    });
+  }
+
   return (
     <Card>
       <CardContent>
@@ -166,40 +193,53 @@ export function RecommendationPayloadCard({
         <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
           <div className="space-y-5">
             <div className="space-y-3">
-              {mealPrefOptions.map((meal) => (
-                <div
-                  key={meal.key}
-                  className="rounded-lg border border-slate-200 bg-white p-4"
-                >
-                  <p className="mb-3 font-bold text-ink">{meal.label}</p>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <MultiSelectDropdown
-                      label="Food category"
-                      options={foodCategoryOptions}
-                      values={payload[meal.key].food_category}
-                      onChange={(values) =>
-                        updateMealPrefs(
-                          meal.key,
-                          "food_category",
-                          values,
-                        )
-                      }
-                    />
-                    <MultiSelectDropdown
-                      label="Main ingredients"
-                      options={mainIngredientOptions}
-                      values={payload[meal.key].main_ingredients}
-                      onChange={(values) =>
-                        updateMealPrefs(
-                          meal.key,
-                          "main_ingredients",
-                          values,
-                        )
-                      }
-                    />
+              {mealPrefOptions.map((meal) => {
+                const selectedCategory = payload[meal.key].food_category[0];
+                const baseIngredients =
+                  meal.key === "breakfast_prefs"
+                    ? breakfastIngredientOptions
+                    : lunchDinnerIngredientOptions;
+
+                const validIngredients =
+                  selectedCategory && categoryToIngredientsMap[selectedCategory]
+                    ? baseIngredients.filter((opt) =>
+                        categoryToIngredientsMap[selectedCategory].includes(
+                          opt.value,
+                        ),
+                      )
+                    : baseIngredients;
+
+                return (
+                  <div
+                    key={meal.key}
+                    className="rounded-lg border border-slate-200 bg-white p-4"
+                  >
+                    <p className="mb-3 font-bold text-ink">{meal.label}</p>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <MultiSelectDropdown
+                        label="Food category"
+                        options={
+                          meal.key === "breakfast_prefs"
+                            ? breakfastCategoryOptions
+                            : lunchDinnerCategoryOptions
+                        }
+                        values={payload[meal.key].food_category}
+                        onChange={(values) =>
+                          handleCategoryChange(meal.key, values)
+                        }
+                      />
+                      <MultiSelectDropdown
+                        label="Main ingredients"
+                        options={validIngredients}
+                        values={payload[meal.key].main_ingredients}
+                        onChange={(values) =>
+                          updateMealPrefs(meal.key, "main_ingredients", values)
+                        }
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <label className="block">
@@ -212,6 +252,7 @@ export function RecommendationPayloadCard({
                   onChange({ ...payload, user_text: event.target.value })
                 }
                 rows={4}
+                placeholder="Contoh: Saya mau makan yang berkuah dan ada ayamnya di siang hari"
                 className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-50"
               />
             </label>
