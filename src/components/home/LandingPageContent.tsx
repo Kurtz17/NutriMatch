@@ -257,10 +257,10 @@ export function LandingPageContent() {
         <div className="app-container grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-bold">
-              <img 
-                src="/images/icon.png" 
-                alt="NutriMatch Icon" 
-                className="h-10 w-10 object-contain drop-shadow-sm" 
+              <img
+                src="/images/icon.png"
+                alt="NutriMatch Icon"
+                className="h-10 w-10 object-contain drop-shadow-sm"
               />
               <span className="text-2xl tracking-tight text-white">
                 NutriMatch

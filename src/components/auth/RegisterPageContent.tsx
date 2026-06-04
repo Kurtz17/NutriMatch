@@ -78,9 +78,9 @@ export function RegisterPageContent() {
   async function handleGoogleSignUp() {
     setError("");
     setIsGoogleLoading(true);
- 
+
     const supabase = createClient();
- 
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -90,13 +90,13 @@ export function RegisterPageContent() {
         },
       },
     });
- 
+
     if (error) {
       setError("Gagal melanjutkan dengan Google. Coba lagi.");
       setIsGoogleLoading(false);
     }
   }
- 
+
   const isAnyLoading = isSubmitting || isGoogleLoading;
 
   return (

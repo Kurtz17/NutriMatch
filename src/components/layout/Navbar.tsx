@@ -108,10 +108,10 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
       <div className="app-container flex min-h-16 flex-wrap items-center justify-between gap-3 py-2">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold">
-            <img 
-              src="/images/icon.png" 
-              alt="NutriMatch Icon" 
-              className="h-9 w-9 object-contain drop-shadow-sm" 
+            <img
+              src="/images/icon.png"
+              alt="NutriMatch Icon"
+              className="h-9 w-9 object-contain drop-shadow-sm"
             />
             <span
               className={cn("text-xl tracking-tight", transparent ? "text-white" : "text-slate-900")}

@@ -108,18 +108,7 @@ function MultiSelectDropdown({
         </div>
       ) : null}
 
-      {selectedOptions.length > 0 ? (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {selectedOptions.map((option) => (
-            <span
-              key={option.value}
-              className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700"
-            >
-              {option.label}
-            </span>
-          ))}
-        </div>
-      ) : null}
+
     </div>
   );
 }
