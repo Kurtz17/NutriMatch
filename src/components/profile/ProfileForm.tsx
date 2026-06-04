@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import {
   allergyFlagsFromText,
+  calculateTargetCalories,
   createRecommendationPayload,
   localIsoDate,
   macroDefaults,
@@ -223,6 +224,41 @@ export function ProfileForm() {
     };
   }, []);
 
+  useEffect(() => {
+    if (
+      profile.age === "" ||
+      profile.weightKg === "" ||
+      profile.heightCm === ""
+    ) {
+      return;
+    }
+
+    const targetCalories = calculateTargetCalories(
+      profile.age,
+      profile.weightKg,
+      profile.heightCm,
+      profile.gender,
+      profile.activityLevel,
+      profile.dietGoal,
+    );
+
+    setRecommendationPayload((current) => {
+      if (current.target_macros.calories === targetCalories) return current;
+
+      return {
+        ...current,
+        target_macros: macroDefaults(targetCalories),
+      };
+    });
+  }, [
+    profile.age,
+    profile.weightKg,
+    profile.heightCm,
+    profile.gender,
+    profile.activityLevel,
+    profile.dietGoal,
+  ]);
+
   const toggleAllergy = (id: AllergyId) => {
     setStatus("");
     setProfile((current) => ({
@@ -282,13 +318,8 @@ export function ProfileForm() {
         return;
       }
 
-      const targetCalories =
-        typeof data.profile?.targetCalories === "number"
-          ? data.profile.targetCalories
-          : recommendationPayload.target_macros.calories;
       const payloadToSave = {
         ...recommendationPayload,
-        target_macros: macroDefaults(targetCalories),
         allergies: allergyFlagsFromText(
           getSelectedAllergyTexts(allergies, profile.allergies),
         ),
