@@ -11,8 +11,8 @@ export function ProfilePageContent() {
             Update profile and allergy data
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-            Edit the same personal, body, goal, activity, and allergy fields used
-            by the recommendation experience.
+            Edit the same personal, body, goal, activity, and allergy fields
+            used by the recommendation experience.
           </p>
         </div>
         <ProfileForm />

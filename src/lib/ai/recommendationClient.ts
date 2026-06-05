@@ -1,4 +1,10 @@
-import { ActivityLevel, HealthGoal, type Allergen, type UserAllergy, type UserProfile } from "@prisma/client";
+import {
+  ActivityLevel,
+  HealthGoal,
+  type Allergen,
+  type UserAllergy,
+  type UserProfile,
+} from "@prisma/client";
 
 export type RecommendRequest = {
   target_macros: {
@@ -50,9 +56,9 @@ export type RecommendResponse = {
       ideal_protein?: number;
       ideal_fat?: number;
       ideal_carb?: number;
-      match_score?: number;       // Made optional — new API format may omit this
-      pairing_group?: string;     // New field in updated API
-      pairing_role?: string;      // New field in updated API
+      match_score?: number;
+      pairing_group?: string;
+      pairing_role?: string;
     }[];
   }[];
   narrative_summary: string;
@@ -143,7 +149,9 @@ function getRequestTimeoutMs() {
     : DEFAULT_REQUEST_TIMEOUT_MS;
 }
 
-export function buildTargetMacros(profile: Pick<UserProfile, "targetCalories">) {
+export function buildTargetMacros(
+  profile: Pick<UserProfile, "targetCalories">,
+) {
   const calories = Math.round(profile.targetCalories ?? 1800);
 
   return {
@@ -189,7 +197,9 @@ function cloneRequest(request: RecommendRequest): RecommendRequest {
   };
 }
 
-export function buildAllergyFlags(allergies: ProfileWithAllergies["allergies"]) {
+export function buildAllergyFlags(
+  allergies: ProfileWithAllergies["allergies"],
+) {
   const flags: RecommendRequest["allergies"] = {
     gluten: 0,
     dairy: 0,
@@ -212,7 +222,11 @@ export function buildAllergyFlags(allergies: ProfileWithAllergies["allergies"]) 
       flags.nuts = 1;
       flags.peanut = 1;
     }
-    if (text.includes("seafood") || text.includes("ikan") || text.includes("udang")) {
+    if (
+      text.includes("seafood") ||
+      text.includes("ikan") ||
+      text.includes("udang")
+    ) {
       flags.seafood = 1;
     }
     if (text.includes("telur") || text.includes("egg")) flags.egg = 1;
@@ -223,7 +237,9 @@ export function buildAllergyFlags(allergies: ProfileWithAllergies["allergies"]) 
   return flags;
 }
 
-export function buildUserText(profile: Pick<UserProfile, "activityLevel" | "healthGoal">) {
+export function buildUserText(
+  profile: Pick<UserProfile, "activityLevel" | "healthGoal">,
+) {
   const goalText: Record<HealthGoal, string> = {
     LOSE_WEIGHT: "weight loss",
     MAINTAIN_WEIGHT: "weight maintenance",
@@ -239,7 +255,9 @@ export function buildUserText(profile: Pick<UserProfile, "activityLevel" | "heal
   return `Generate balanced daily meal recommendations for ${goalText[profile.healthGoal]} with ${activityText[profile.activityLevel]}. Prioritize practical foods and respect allergy flags.`;
 }
 
-function buildDefaultRecommendRequest(profile: ProfileWithAllergies): RecommendRequest {
+function buildDefaultRecommendRequest(
+  profile: ProfileWithAllergies,
+): RecommendRequest {
   return {
     target_macros: buildTargetMacros(profile),
     allergies: buildAllergyFlags(profile.allergies),
@@ -282,7 +300,11 @@ function normalizeNumberField({
   if (value == null || value === "") return fallback;
 
   const parsed = toNumber(value);
-  if (!Number.isFinite(parsed) || parsed < min || (max != null && parsed > max)) {
+  if (
+    !Number.isFinite(parsed) ||
+    parsed < min ||
+    (max != null && parsed > max)
+  ) {
     errors.push(
       max == null
         ? `${field} harus berupa angka minimal ${min}.`
@@ -309,9 +331,7 @@ function normalizeBoolean(value: unknown, fallback: boolean) {
 
 function normalizeStringList(value: unknown) {
   if (Array.isArray(value)) {
-    return value
-      .map((item) => String(item).trim())
-      .filter(Boolean);
+    return value.map((item) => String(item).trim()).filter(Boolean);
   }
 
   if (typeof value === "string") {
@@ -425,7 +445,8 @@ export function normalizeRecommendRequestInput(
     const rawValue = (inputAllergies as Partial<Record<AllergyKey, unknown>>)[
       key
     ];
-    allergies[key] = rawValue == null ? base.allergies[key] : normalizeFlag(rawValue);
+    allergies[key] =
+      rawValue == null ? base.allergies[key] : normalizeFlag(rawValue);
   }
 
   const userText =
@@ -486,7 +507,9 @@ export function buildRecommendRequest(
   };
 }
 
-function validateRecommendResponse(value: unknown): asserts value is RecommendResponse {
+function validateRecommendResponse(
+  value: unknown,
+): asserts value is RecommendResponse {
   if (!value || typeof value !== "object") {
     throw new AiRecommendationError("AI response is not a valid object.");
   }
@@ -496,10 +519,14 @@ function validateRecommendResponse(value: unknown): asserts value is RecommendRe
     throw new AiRecommendationError("AI response is missing daily_plan.");
   }
   if (response.daily_plan.length === 0) {
-    throw new AiRecommendationError("AI response returned an empty daily_plan.");
+    throw new AiRecommendationError(
+      "AI response returned an empty daily_plan.",
+    );
   }
   if (typeof response.narrative_summary !== "string") {
-    throw new AiRecommendationError("AI response is missing narrative_summary.");
+    throw new AiRecommendationError(
+      "AI response is missing narrative_summary.",
+    );
   }
 
   let totalRecommendations = 0;
@@ -511,7 +538,9 @@ function validateRecommendResponse(value: unknown): asserts value is RecommendRe
       !isNumber(meal.target_calories) ||
       !Array.isArray(meal.recommendations)
     ) {
-      throw new AiRecommendationError("AI response contains an invalid meal plan.");
+      throw new AiRecommendationError(
+        "AI response contains an invalid meal plan.",
+      );
     }
     totalRecommendations += meal.recommendations.length;
 
@@ -522,10 +551,14 @@ function validateRecommendResponse(value: unknown): asserts value is RecommendRe
         !isNumber(recommendation.calories_100g) ||
         !isNumber(recommendation.ideal_grams) ||
         !isNumber(recommendation.ideal_calories)
-        // match_score is now optional — newer API versions may not include it
       ) {
-        console.error("[AI] Invalid recommendation item:", JSON.stringify(recommendation));
-        throw new AiRecommendationError("AI response contains an invalid recommendation.");
+        console.error(
+          "[AI] Invalid recommendation item:",
+          JSON.stringify(recommendation),
+        );
+        throw new AiRecommendationError(
+          "AI response contains an invalid recommendation.",
+        );
       }
     }
   }
@@ -673,14 +706,20 @@ export async function requestAiMealRecommendation(
     }
 
     if (!response.ok) {
-      console.error(`[AI] Non-OK response (${response.status}):`, JSON.stringify(body));
+      console.error(
+        `[AI] Non-OK response (${response.status}):`,
+        JSON.stringify(body),
+      );
       throw new AiRecommendationError(
         "AI recommendation service returned an error.",
         response.status,
       );
     }
 
-    console.log("[AI] Raw response sample:", JSON.stringify(body).slice(0, 500));
+    console.log(
+      "[AI] Raw response sample:",
+      JSON.stringify(body).slice(0, 500),
+    );
     validateRecommendResponse(body);
     return normalizeRecommendResponse(body);
   } catch (error) {
@@ -688,19 +727,20 @@ export async function requestAiMealRecommendation(
       throw error;
     }
 
-    // --- DEBUG: log raw error so we can diagnose the real cause ---
     console.error("[AI] Unexpected error type:", typeof error);
     console.error("[AI] Is Error instance:", error instanceof Error);
     if (error instanceof Error) {
       console.error("[AI] error.name:", error.name);
       console.error("[AI] error.message:", error.message);
-      console.error("[AI] error.cause:", (error as NodeJS.ErrnoException).cause);
+      console.error(
+        "[AI] error.cause:",
+        (error as NodeJS.ErrnoException).cause,
+      );
       console.error("[AI] error.code:", (error as NodeJS.ErrnoException).code);
       console.error("[AI] error.stack:", error.stack);
     } else {
       console.error("[AI] Raw error value:", JSON.stringify(error));
     }
-    // --------------------------------------------------------------
 
     if (
       error instanceof Error &&

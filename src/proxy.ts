@@ -3,7 +3,12 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_ONLY_ROUTES = ["/login", "/register"];
 
-const PROTECTED_ROUTES = ["/dashboard", "/profile", "/onboarding", "/meal-plan"];
+const PROTECTED_ROUTES = [
+  "/dashboard",
+  "/profile",
+  "/onboarding",
+  "/meal-plan",
+];
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -18,15 +23,15 @@ export async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   const {
@@ -35,17 +40,15 @@ export async function proxy(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // Kalau belum login dan mencoba akses halaman protected → redirect ke login
   const isProtected = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route)
+    pathname.startsWith(route),
   );
   if (!user && isProtected) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Kalau sudah login dan mencoba akses halaman login/register → redirect ke dashboard
   const isPublicOnly = PUBLIC_ONLY_ROUTES.some((route) =>
-    pathname.startsWith(route)
+    pathname.startsWith(route),
   );
   if (user && isPublicOnly) {
     return NextResponse.redirect(new URL("/dashboard", request.url));

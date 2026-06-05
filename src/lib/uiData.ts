@@ -27,8 +27,7 @@ const imageByCategory: Record<string, string> = {
     "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
   Sayuran:
     "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80",
-  Buah:
-    "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=900&q=80",
+  Buah: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=900&q=80",
   Minuman:
     "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
   "Makanan Khas":
@@ -77,11 +76,9 @@ export function mealTypeLabel(mealType: string): MealType {
 
 export function toUiMeal(item: MealItem): Meal {
   const category = item.food.category ?? "";
-  // Prioritize imageUrl from food DB (set by AI), fallback to category image
+
   const image =
-    item.food.imageUrl ||
-    imageByCategory[category] ||
-    FALLBACK_IMAGE;
+    item.food.imageUrl || imageByCategory[category] || FALLBACK_IMAGE;
 
   return {
     id: item.id,
@@ -92,10 +89,14 @@ export function toUiMeal(item: MealItem): Meal {
     carbs: Math.round(item.carbsG),
     fat: Math.round(item.fatG),
     calories100g:
-      item.caloriesPer100g == null ? undefined : Math.round(item.caloriesPer100g),
+      item.caloriesPer100g == null
+        ? undefined
+        : Math.round(item.caloriesPer100g),
     idealGrams: Math.round(item.servingG),
     matchScore:
-      item.matchScore == null ? undefined : Math.round(item.matchScore * 100) / 100,
+      item.matchScore == null
+        ? undefined
+        : Math.round(item.matchScore * 100) / 100,
     image,
     ingredients: [
       item.food.name,

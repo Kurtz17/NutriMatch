@@ -67,7 +67,7 @@ export function DashboardPreviewSection() {
         if (!active || !profile) return;
         const t = profile.targetCalories ?? 1900;
         const allergies = (profile.allergies ?? []).map(
-          (a: { allergen: { name: string } }) => a.allergen.name
+          (a: { allergen: { name: string } }) => a.allergen.name,
         );
         setD({
           name: user.name ?? user.email?.split("@")[0] ?? "User",
@@ -76,12 +76,14 @@ export function DashboardPreviewSection() {
           tdee: Math.round(profile.tdee ?? 2140),
           protein: Math.round((t * 0.25) / 4),
           carbs: Math.round((t * 0.45) / 4),
-          fat: Math.round((t * 0.30) / 9),
+          fat: Math.round((t * 0.3) / 9),
           allergies: allergies.length > 0 ? allergies : SAMPLE.allergies,
         });
-      } catch { /* keep sample */ }
+      } catch {}
     })();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
 
   const macros = [
@@ -94,7 +96,6 @@ export function DashboardPreviewSection() {
     <section className="bg-slate-50 py-16 sm:py-20">
       <div className="app-container">
         <div className="grid items-center gap-10 lg:grid-cols-2">
-          {/* Left text */}
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-700">
               Dashboard Preview
@@ -106,7 +107,8 @@ export function DashboardPreviewSection() {
             </h2>
             <p className="mt-4 max-w-md text-base leading-7 text-muted">
               Your dashboard brings everything together—targets, allergies, meal
-              previews, and nutrition summaries—so you can plan smarter every day.
+              previews, and nutrition summaries—so you can plan smarter every
+              day.
             </p>
             <Link
               href="/dashboard"
@@ -116,10 +118,8 @@ export function DashboardPreviewSection() {
             </Link>
           </div>
 
-          {/* Right dashboard mockup */}
           <div className="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
             <div className="flex">
-              {/* Mini sidebar */}
               <div className="hidden w-44 shrink-0 border-r border-slate-100 bg-slate-50 p-3 sm:block">
                 <div className="mb-4 flex items-center gap-2 px-1">
                   <img src="/images/icon.png" alt="" className="h-6 w-6" />
@@ -138,36 +138,63 @@ export function DashboardPreviewSection() {
                     {item.label}
                   </div>
                 ))}
-                {/* User */}
+
                 <div className="mt-6 flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-2">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-500 text-[9px] font-bold text-white">
                     {d.name[0]?.toUpperCase()}
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-[10px] font-bold text-ink">{d.name}</p>
+                    <p className="truncate text-[10px] font-bold text-ink">
+                      {d.name}
+                    </p>
                     <p className="text-[9px] text-muted">Premium Plan</p>
                   </div>
                 </div>
               </div>
 
-              {/* Main content area */}
               <div className="flex-1 p-4">
-                {/* Stats row */}
                 <div className="mb-3 grid grid-cols-4 gap-2">
-                  <MiniStat label="Calorie Target" value={d.calorieTarget} unit="kcal" icon={Target} accent="emerald" />
-                  <MiniStat label="BMR" value={d.bmr} unit="kcal" icon={Flame} accent="amber" />
-                  <MiniStat label="TDEE" value={d.tdee} unit="kcal" icon={Activity} accent="blue" />
-                  <MiniStat label="Protein" value={d.protein} unit={`${d.protein}g`} icon={Utensils} accent="emerald" />
+                  <MiniStat
+                    label="Calorie Target"
+                    value={d.calorieTarget}
+                    unit="kcal"
+                    icon={Target}
+                    accent="emerald"
+                  />
+                  <MiniStat
+                    label="BMR"
+                    value={d.bmr}
+                    unit="kcal"
+                    icon={Flame}
+                    accent="amber"
+                  />
+                  <MiniStat
+                    label="TDEE"
+                    value={d.tdee}
+                    unit="kcal"
+                    icon={Activity}
+                    accent="blue"
+                  />
+                  <MiniStat
+                    label="Protein"
+                    value={d.protein}
+                    unit={`${d.protein}g`}
+                    icon={Utensils}
+                    accent="emerald"
+                  />
                 </div>
 
-                {/* Body */}
                 <div className="grid grid-cols-3 gap-2">
-                  {/* Allergies */}
                   <div className="rounded-lg bg-slate-50 p-2.5">
-                    <p className="mb-2 text-[10px] font-bold text-ink">Allergies</p>
+                    <p className="mb-2 text-[10px] font-bold text-ink">
+                      Allergies
+                    </p>
                     <div className="space-y-1">
                       {d.allergies.slice(0, 4).map((a) => (
-                        <div key={a} className="flex items-center gap-1 rounded bg-white px-1.5 py-1 text-[9px] font-semibold text-red-700 shadow-sm">
+                        <div
+                          key={a}
+                          className="flex items-center gap-1 rounded bg-white px-1.5 py-1 text-[9px] font-semibold text-red-700 shadow-sm"
+                        >
                           <ShieldAlert className="h-2.5 w-2.5" /> {a}
                         </div>
                       ))}
@@ -177,47 +204,100 @@ export function DashboardPreviewSection() {
                     </button>
                   </div>
 
-                  {/* Today's Plan */}
                   <div className="rounded-lg bg-slate-50 p-2.5">
-                    <p className="mb-2 text-[10px] font-bold text-ink">Today&apos;s Plan</p>
+                    <p className="mb-2 text-[10px] font-bold text-ink">
+                      Today&apos;s Plan
+                    </p>
                     {todayMeals.map((m, i) => (
-                      <div key={i} className="mb-1.5 rounded bg-white p-1.5 shadow-sm">
-                        <p className="text-[10px] font-semibold text-ink">{m.name}</p>
+                      <div
+                        key={i}
+                        className="mb-1.5 rounded bg-white p-1.5 shadow-sm"
+                      >
+                        <p className="text-[10px] font-semibold text-ink">
+                          {m.name}
+                        </p>
                         <p className="text-[9px] text-muted">{m.cal} kcal</p>
                       </div>
                     ))}
                     <button className="mt-1 flex items-center gap-0.5 text-[9px] font-semibold text-brand-600">
-                      View full 7-day plan <ChevronRight className="h-2.5 w-2.5" />
+                      View full 7-day plan{" "}
+                      <ChevronRight className="h-2.5 w-2.5" />
                     </button>
                   </div>
 
-                  {/* Nutrition Summary */}
                   <div className="rounded-lg bg-slate-50 p-2.5">
-                    <p className="mb-2 text-[10px] font-bold text-ink">Nutrition Summary</p>
+                    <p className="mb-2 text-[10px] font-bold text-ink">
+                      Nutrition Summary
+                    </p>
                     <div className="flex items-center justify-center">
                       <svg viewBox="0 0 36 36" className="h-14 w-14">
-                        <circle cx="18" cy="18" r="14" fill="none" stroke="#e2e8f0" strokeWidth="4" />
-                        <circle cx="18" cy="18" r="14" fill="none" stroke="#16a34a" strokeWidth="4"
-                          strokeDasharray="22 66" strokeDashoffset="25" strokeLinecap="round" />
-                        <circle cx="18" cy="18" r="14" fill="none" stroke="#2563eb" strokeWidth="4"
-                          strokeDasharray="40 48" strokeDashoffset="3" strokeLinecap="round" />
-                        <circle cx="18" cy="18" r="14" fill="none" stroke="#f59e0b" strokeWidth="4"
-                          strokeDasharray="26 62" strokeDashoffset="-37" strokeLinecap="round" />
+                        <circle
+                          cx="18"
+                          cy="18"
+                          r="14"
+                          fill="none"
+                          stroke="#e2e8f0"
+                          strokeWidth="4"
+                        />
+                        <circle
+                          cx="18"
+                          cy="18"
+                          r="14"
+                          fill="none"
+                          stroke="#16a34a"
+                          strokeWidth="4"
+                          strokeDasharray="22 66"
+                          strokeDashoffset="25"
+                          strokeLinecap="round"
+                        />
+                        <circle
+                          cx="18"
+                          cy="18"
+                          r="14"
+                          fill="none"
+                          stroke="#2563eb"
+                          strokeWidth="4"
+                          strokeDasharray="40 48"
+                          strokeDashoffset="3"
+                          strokeLinecap="round"
+                        />
+                        <circle
+                          cx="18"
+                          cy="18"
+                          r="14"
+                          fill="none"
+                          stroke="#f59e0b"
+                          strokeWidth="4"
+                          strokeDasharray="26 62"
+                          strokeDashoffset="-37"
+                          strokeLinecap="round"
+                        />
                       </svg>
                     </div>
                     <div className="mt-2 space-y-1">
                       {macros.map((m) => (
-                        <div key={m.label} className="flex items-center justify-between">
+                        <div
+                          key={m.label}
+                          className="flex items-center justify-between"
+                        >
                           <div className="flex items-center gap-1">
-                            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: m.color }} />
-                            <span className="text-[9px] text-muted">{m.label}</span>
+                            <span
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{ backgroundColor: m.color }}
+                            />
+                            <span className="text-[9px] text-muted">
+                              {m.label}
+                            </span>
                           </div>
-                          <span className="text-[9px] font-bold text-ink">{m.pct}%</span>
+                          <span className="text-[9px] font-bold text-ink">
+                            {m.pct}%
+                          </span>
                         </div>
                       ))}
                     </div>
                     <button className="mt-2 flex items-center gap-0.5 text-[9px] font-semibold text-brand-600">
-                      View full nutrition <ChevronRight className="h-2.5 w-2.5" />
+                      View full nutrition{" "}
+                      <ChevronRight className="h-2.5 w-2.5" />
                     </button>
                   </div>
                 </div>
@@ -230,18 +310,43 @@ export function DashboardPreviewSection() {
   );
 }
 
-function MiniStat({ label, value, unit, icon: Icon, accent }: {
-  label: string; value: number; unit: string; icon: typeof Target; accent: string;
+function MiniStat({
+  label,
+  value,
+  unit,
+  icon: Icon,
+  accent,
+}: {
+  label: string;
+  value: number;
+  unit: string;
+  icon: typeof Target;
+  accent: string;
 }) {
-  const bg = accent === "emerald" ? "bg-emerald-50" : accent === "amber" ? "bg-amber-50" : "bg-sky-50";
-  const text = accent === "emerald" ? "text-emerald-700" : accent === "amber" ? "text-amber-700" : "text-sky-700";
+  const bg =
+    accent === "emerald"
+      ? "bg-emerald-50"
+      : accent === "amber"
+        ? "bg-amber-50"
+        : "bg-sky-50";
+  const text =
+    accent === "emerald"
+      ? "text-emerald-700"
+      : accent === "amber"
+        ? "text-amber-700"
+        : "text-sky-700";
   return (
     <div className={`rounded-lg ${bg} p-2`}>
       <div className="mb-1 flex items-center justify-between">
         <p className="text-[9px] font-semibold text-muted">{label}</p>
         <Icon className={`h-3 w-3 ${text}`} />
       </div>
-      <p className="text-sm font-bold text-ink">{value}<span className="ml-0.5 text-[9px] font-semibold text-muted">{unit === "kcal" ? "kcal" : ""}</span></p>
+      <p className="text-sm font-bold text-ink">
+        {value}
+        <span className="ml-0.5 text-[9px] font-semibold text-muted">
+          {unit === "kcal" ? "kcal" : ""}
+        </span>
+      </p>
     </div>
   );
 }

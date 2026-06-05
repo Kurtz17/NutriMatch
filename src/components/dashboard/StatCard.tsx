@@ -32,7 +32,11 @@ export function StatCard({
           <span className={cn("rounded-lg p-2.5", toneStyles[tone])}>
             <Icon className="h-5 w-5" />
           </span>
-          {badge ? <Badge variant={tone === "amber" ? "warning" : "neutral"}>{badge}</Badge> : null}
+          {badge ? (
+            <Badge variant={tone === "amber" ? "warning" : "neutral"}>
+              {badge}
+            </Badge>
+          ) : null}
         </div>
         <div>
           <p className="text-sm font-semibold text-muted">{title}</p>

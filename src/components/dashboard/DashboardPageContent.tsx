@@ -48,9 +48,7 @@ export async function DashboardPageContent() {
         <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:py-8">
           <Card>
             <CardContent>
-              <p className="text-sm font-semibold text-brand-700">
-                Dashboard
-              </p>
+              <p className="text-sm font-semibold text-brand-700">Dashboard</p>
               <h1 className="mt-2 text-3xl font-bold tracking-normal text-ink">
                 Complete your nutrition profile
               </h1>
@@ -79,10 +77,7 @@ export async function DashboardPageContent() {
         include: {
           food: true,
         },
-        orderBy: [
-          { dayNumber: "asc" },
-          { mealType: "asc" },
-        ],
+        orderBy: [{ dayNumber: "asc" }, { mealType: "asc" }],
       },
     },
   });
@@ -94,16 +89,21 @@ export async function DashboardPageContent() {
   });
   const allergyLabels = profile.allergies.map((item) => item.allergen.name);
   const firstName =
-    profile.user.name?.trim().split(/\s+/)[0] ?? user.email?.split("@")[0] ?? "there";
+    profile.user.name?.trim().split(/\s+/)[0] ??
+    user.email?.split("@")[0] ??
+    "there";
   const previewMeals =
-    mealPlan?.items.filter((item) => item.dayNumber === 1).slice(0, 2).map(toUiMeal) ??
-    [];
+    mealPlan?.items
+      .filter((item) => item.dayNumber === 1)
+      .slice(0, 2)
+      .map(toUiMeal) ?? [];
 
   const insight = {
     title: "Profile-based nutrition target",
     summary: `Your current plan targets ${nutritionSummary.calorieTarget} kcal per day from your saved body metrics and goal.`,
     highlights: [
-      `${allergyLabels.length} allergy filter${allergyLabels.length === 1 ? "" : "s"
+      `${allergyLabels.length} allergy filter${
+        allergyLabels.length === 1 ? "" : "s"
       } active`,
       `${nutritionSummary.bmr} kcal BMR`,
       `${nutritionSummary.tdee} kcal estimated TDEE`,
@@ -191,7 +191,11 @@ export async function DashboardPageContent() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {allergyLabels.map((label) => (
-                        <Badge key={label} variant="safe" className="border-emerald-200 bg-white shadow-sm">
+                        <Badge
+                          key={label}
+                          variant="safe"
+                          className="border-emerald-200 bg-white shadow-sm"
+                        >
                           {label}
                         </Badge>
                       ))}
@@ -199,7 +203,8 @@ export async function DashboardPageContent() {
                     <div className="mt-3 flex items-center gap-2 border-t border-emerald-100 pt-3">
                       <ShieldCheck className="h-4 w-4 text-emerald-600" />
                       <p className="text-xs text-emerald-700">
-                        AI strictly avoids generating meals with these ingredients.
+                        AI strictly avoids generating meals with these
+                        ingredients.
                       </p>
                     </div>
                   </div>

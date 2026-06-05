@@ -79,7 +79,13 @@ type ApiMealPlanResponse = {
 
 const MEAL_SECTION_META: Record<
   MealType,
-  { icon: React.ReactNode; label: string; description: string; color: string; bg: string }
+  {
+    icon: React.ReactNode;
+    label: string;
+    description: string;
+    color: string;
+    bg: string;
+  }
 > = {
   Breakfast: {
     icon: <Coffee className="h-5 w-5" />,
@@ -148,7 +154,9 @@ function MealSection({
 
   return (
     <div className="mb-8">
-      <div className={`mb-4 flex items-center justify-between rounded-xl border px-4 py-3 ${meta.bg}`}>
+      <div
+        className={`mb-4 flex items-center justify-between rounded-xl border px-4 py-3 ${meta.bg}`}
+      >
         <div className={`flex items-center gap-2.5 ${meta.color}`}>
           {meta.icon}
           <div>
@@ -305,7 +313,9 @@ export function MealPlanPageContent() {
       await loadMealPlan();
       setActiveDay(1);
     } catch {
-      setError("Tidak bisa menghubungi server. Coba jalankan ulang aplikasinya.");
+      setError(
+        "Tidak bisa menghubungi server. Coba jalankan ulang aplikasinya.",
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -314,7 +324,6 @@ export function MealPlanPageContent() {
   return (
     <DashboardShell>
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
-        {/* Header */}
         <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
             <p className="text-sm font-semibold text-brand-700">
@@ -340,7 +349,6 @@ export function MealPlanPageContent() {
           </p>
         ) : null}
 
-        {/* Loading state */}
         {isLoading ? (
           <Card>
             <CardContent>
@@ -384,10 +392,17 @@ export function MealPlanPageContent() {
                 profile.
               </p>
               <div className="mt-5 max-w-md">
-                <HalalOnlyCheckbox checked={halalOnly} onChange={setHalalOnly} />
+                <HalalOnlyCheckbox
+                  checked={halalOnly}
+                  onChange={setHalalOnly}
+                />
               </div>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Button size="lg" onClick={generateMealPlan} disabled={isGenerating}>
+                <Button
+                  size="lg"
+                  onClick={generateMealPlan}
+                  disabled={isGenerating}
+                >
                   <RefreshCcw className="h-5 w-5" />
                   {isGenerating ? "Generating..." : "Generate meal plan"}
                 </Button>
@@ -401,9 +416,7 @@ export function MealPlanPageContent() {
             </CardContent>
           </Card>
         ) : (
-          /* Main content: tabs + sections + sidebar */
           <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-            {/* Left: day tabs + meal sections */}
             <div className="min-w-0">
               <MealPlanTabs
                 days={days}
@@ -411,7 +424,6 @@ export function MealPlanPageContent() {
                 onChange={setActiveDay}
               />
 
-              {/* Daily summary bar */}
               {currentDay && (
                 <div className="mt-4 mb-6 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-5 py-3">
                   <div>
@@ -430,13 +442,19 @@ export function MealPlanPageContent() {
                     </p>
                   </div>
                   <div className="flex gap-4 text-center">
-                    {(["Breakfast", "Lunch", "Dinner", "Snack"] as MealType[]).map((t) => {
+                    {(
+                      ["Breakfast", "Lunch", "Dinner", "Snack"] as MealType[]
+                    ).map((t) => {
                       const count = currentDay.mealsByType[t].length;
                       const meta = MEAL_SECTION_META[t];
                       return (
                         <div key={t} className="hidden sm:block">
-                          <p className={`text-xs font-semibold ${meta.color}`}>{meta.label}</p>
-                          <p className="mt-0.5 text-sm font-bold text-ink">{count} item</p>
+                          <p className={`text-xs font-semibold ${meta.color}`}>
+                            {meta.label}
+                          </p>
+                          <p className="mt-0.5 text-sm font-bold text-ink">
+                            {count} item
+                          </p>
                         </div>
                       );
                     })}
@@ -444,7 +462,6 @@ export function MealPlanPageContent() {
                 </div>
               )}
 
-              {/* Meal sections per type */}
               {currentDay &&
                 MEAL_TYPE_ORDER.map((mealType) => (
                   <MealSection
@@ -456,7 +473,6 @@ export function MealPlanPageContent() {
                 ))}
             </div>
 
-            {/* Right sidebar */}
             <div className="space-y-4">
               {narrativeSummary ? (
                 <Card>
@@ -547,7 +563,6 @@ export function MealPlanPageContent() {
         )}
       </div>
 
-      {/* Meal detail modal */}
       {selectedMeal ? (
         <div
           role="dialog"
@@ -586,7 +601,9 @@ export function MealPlanPageContent() {
                 <div className="grid grid-cols-4 gap-2 text-center">
                   {selectedMealStats.map(([label, value]) => (
                     <div key={label} className="rounded-lg bg-slate-50 p-3">
-                      <p className="text-xs font-semibold text-muted">{label}</p>
+                      <p className="text-xs font-semibold text-muted">
+                        {label}
+                      </p>
                       <p className="mt-1 text-sm font-bold text-ink">{value}</p>
                     </div>
                   ))}
@@ -621,7 +638,9 @@ export function MealPlanPageContent() {
                   <div className="flex gap-3">
                     <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
                     <div>
-                      <h3 className="font-bold text-ink">Why this meal fits you</h3>
+                      <h3 className="font-bold text-ink">
+                        Why this meal fits you
+                      </h3>
                       <p className="mt-2 text-sm leading-6 text-muted">
                         {selectedMeal.fitReason}
                       </p>

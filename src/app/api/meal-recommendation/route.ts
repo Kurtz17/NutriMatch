@@ -73,7 +73,8 @@ export async function POST() {
     if (!profile || !profile.targetCalories) {
       return NextResponse.json(
         {
-          error: "Profil belum lengkap. Silakan isi data fisik terlebih dahulu.",
+          error:
+            "Profil belum lengkap. Silakan isi data fisik terlebih dahulu.",
         },
         { status: 400 },
       );

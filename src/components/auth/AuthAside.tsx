@@ -18,10 +18,10 @@ export function AuthAside({
       )}
     >
       <div className="absolute inset-x-0 bottom-0 p-8 text-white">
-        <img 
-          src="/images/icon.png" 
-          alt="NutriMatch Icon" 
-          className="h-12 w-12 object-contain drop-shadow-md" 
+        <img
+          src="/images/icon.png"
+          alt="NutriMatch Icon"
+          className="h-12 w-12 object-contain drop-shadow-md"
         />
         <h2 className="mt-6 max-w-md text-3xl font-bold tracking-normal">
           {title}

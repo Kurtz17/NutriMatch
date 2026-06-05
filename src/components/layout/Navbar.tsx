@@ -115,7 +115,10 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
               className="h-9 w-9 object-contain drop-shadow-sm"
             />
             <span
-              className={cn("text-xl tracking-tight", transparent ? "text-white" : "text-slate-900")}
+              className={cn(
+                "text-xl tracking-tight",
+                transparent ? "text-white" : "text-slate-900",
+              )}
             >
               NutriMatch
             </span>
@@ -135,9 +138,9 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
                   "shrink-0 rounded-lg px-2.5 py-2 transition md:px-0 md:py-0",
                   linkClass,
                   active &&
-                  (transparent
-                    ? "bg-white/10 text-white md:bg-transparent"
-                    : "bg-brand-50 text-brand-700 md:bg-transparent"),
+                    (transparent
+                      ? "bg-white/10 text-white md:bg-transparent"
+                      : "bg-brand-50 text-brand-700 md:bg-transparent"),
                 )}
                 href={item.href}
               >
@@ -168,7 +171,11 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
                   )}
                 >
                   {user.photoUrl ? (
-                    <img src={user.photoUrl} alt="Avatar" className="h-full w-full object-cover" />
+                    <img
+                      src={user.photoUrl}
+                      alt="Avatar"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <UserRound className="h-5 w-5 opacity-80" />
                   )}
@@ -194,7 +201,8 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
                     variant: transparent ? "ghost" : "outline",
                     size: "icon",
                   }),
-                  transparent && "text-white hover:bg-white/10 hover:text-white",
+                  transparent &&
+                    "text-white hover:bg-white/10 hover:text-white",
                 )}
                 onClick={handleLogout}
                 disabled={isLoggingOut}
@@ -205,10 +213,7 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
               </button>
             </div>
           ) : (
-            <Link
-              href="/register"
-              className={buttonStyles({ size: "sm" })}
-            >
+            <Link href="/register" className={buttonStyles({ size: "sm" })}>
               Get Started
             </Link>
           )}

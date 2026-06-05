@@ -2,16 +2,13 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 
-// =============================================================================
-// GET /api/meal-plan/history
-// Ambil seluruh riwayat meal plan user, diurutkan dari yang terbaru
-// Response ringan — hanya summary per plan, tidak include semua items
-// =============================================================================
-
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -75,7 +72,7 @@ export async function GET() {
     console.error("GET /api/meal-plan/history error:", error);
     return NextResponse.json(
       { error: "Terjadi kesalahan server" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

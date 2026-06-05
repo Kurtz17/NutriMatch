@@ -1,82 +1,151 @@
 # NutriMatch
 
-NutriMatch adalah prototype aplikasi rekomendasi meal plan yang membantu pengguna menyusun rencana makan berdasarkan kebutuhan nutrisi pribadi dan alergi makanan. Aplikasi ini dirancang untuk memberikan pengalaman yang lebih aman, personal, dan mudah dipahami ketika pengguna ingin mengatur pola makan harian.
+NutriMatch adalah aplikasi web rekomendasi meal plan berbasis AI yang membantu pengguna menyusun rencana makan mingguan berdasarkan kebutuhan nutrisi pribadi dan keamanan alergi makanan. Aplikasi ini menggabungkan perhitungan nutrisi (BMR, TDEE, target kalori), preferensi diet, serta filter alergi untuk menghasilkan rekomendasi makanan yang aman, personal, dan mudah dipahami.
+
+## Tim Pengembang
+
+| ID Cohort | Nama Anggota | Role |
+|---|---|---|
+| CFCC011D6Y1555 | Muhammad Zahran Muntazar | Full-Stack Web Developer |
+| CFCC011D6Y1066 | Alfarisy Nafaro Gymnastiar | Full-Stack Web Developer |
+| CDCC011D6Y1666 | Athallah Azhar Aulia Hadi | Data Scientist |
+| CDCC237D6Y1336 | Moch Nafis Azhar | Data Scientist |
+| CACC011D6Y0879 | Hamud Abdul Aziz | AI Engineer |
+| CACC011D6Y2553 | Dzikri Bassyril Mu'Minin | AI Engineer |
+
+## Tautan Model ML dan Dashboard
+
+| Tautan | Keterangan |
+|---|---|
+| [Dashboard Interaktif (Streamlit)](https://cc26-dashbpard-interaktif-nutrimatch.streamlit.app/) | Dashboard analisis data nutrisi dan visualisasi dataset |
+| [Model AI (Google Drive)](https://drive.google.com/drive/u/0/folders/1vayBijae542zwS2FVSUJq7_lh77N1p9e) | Folder berisi model Machine Learning yang digunakan dalam aplikasi |
 
 ## Latar Belakang
 
-Banyak orang ingin menjaga pola makan, tetapi sering kesulitan menentukan makanan yang sesuai dengan kebutuhan tubuh mereka. Kebutuhan kalori setiap orang berbeda, tergantung usia, jenis kelamin, tinggi badan, berat badan, aktivitas harian, dan tujuan diet.
+Banyak orang ingin menjaga pola makan, tetapi sering kesulitan menentukan makanan yang sesuai dengan kebutuhan tubuh mereka. Kebutuhan kalori setiap orang berbeda-beda tergantung usia, jenis kelamin, tinggi badan, berat badan, tingkat aktivitas harian, dan tujuan diet.
 
-Di sisi lain, pengguna dengan alergi makanan membutuhkan perhatian tambahan. Rekomendasi makanan yang tidak mempertimbangkan alergi dapat berisiko bagi kesehatan. Karena itu, NutriMatch dibuat untuk menggabungkan kebutuhan nutrisi dan keamanan alergi dalam satu alur aplikasi.
+Di sisi lain, pengguna dengan alergi makanan membutuhkan perhatian tambahan. Rekomendasi makanan yang tidak mempertimbangkan alergi dapat berisiko bagi kesehatan. NutriMatch hadir untuk menggabungkan kebutuhan nutrisi dan keamanan alergi dalam satu alur aplikasi yang terintegrasi.
 
-## Tujuan Project
+## Tujuan Proyek
 
-NutriMatch bertujuan untuk:
-
-- Membantu pengguna membuat profil nutrisi pribadi.
-- Menghitung kebutuhan energi seperti BMR, TDEE, dan target kalori harian.
-- Memberikan rekomendasi meal plan yang menyesuaikan tujuan diet pengguna.
-- Menampilkan informasi alergi agar rekomendasi makanan lebih aman.
-- Menyajikan insight nutrisi dengan tampilan yang sederhana dan mudah dipahami.
-
-## Konsep Aplikasi
-
-NutriMatch bekerja dengan mengumpulkan informasi dasar pengguna, seperti data tubuh, aktivitas, tujuan diet, dan alergi. Dari data tersebut, aplikasi menyimpan profil pengguna, menghitung ringkasan kebutuhan nutrisi, dan membuat rekomendasi meal plan mingguan melalui API aplikasi.
-
-## Alur Pengguna
-
-1. Pengguna membuka aplikasi dan melihat informasi singkat mengenai NutriMatch.
-2. Pengguna melakukan register atau login.
-3. Pengguna mengisi onboarding profile, termasuk data personal, body profile, activity level, diet goal, dan alergi makanan.
-4. Aplikasi menampilkan dashboard berisi ringkasan kebutuhan nutrisi pengguna.
-5. Pengguna dapat melihat rekomendasi 7-day meal plan.
-6. Pengguna dapat membuka detail makanan untuk melihat kalori, makro nutrisi, bahan makanan, dan analisis alergi.
-7. Pengguna dapat mengubah data profil melalui halaman profile.
+- Membantu pengguna membuat profil nutrisi pribadi secara lengkap.
+- Menghitung kebutuhan energi harian (BMR, TDEE, target kalori) berdasarkan data profil.
+- Memberikan rekomendasi meal plan 7 hari yang disesuaikan dengan tujuan diet pengguna.
+- Memfilter rekomendasi makanan berdasarkan alergi yang dimiliki pengguna.
+- Menyajikan insight nutrisi dan analisis keamanan alergi dengan tampilan yang informatif.
 
 ## Fitur Utama
 
 ### Personalized Nutrition Profile
-
-Pengguna dapat mengisi data seperti nama, usia, gender, tinggi badan, berat badan, tingkat aktivitas, dan tujuan diet. Data ini menjadi dasar untuk menentukan kebutuhan nutrisi pengguna.
+Pengguna mengisi data seperti nama, usia, gender, tinggi badan, berat badan, tingkat aktivitas, dan tujuan diet melalui proses onboarding terarah. Data ini menjadi dasar seluruh perhitungan dan rekomendasi.
 
 ### Nutrition Summary
-
-Aplikasi menampilkan ringkasan nutrisi seperti:
-
-- BMR atau Basal Metabolic Rate.
-- TDEE atau Total Daily Energy Expenditure.
-- Target kalori harian.
-- Distribusi makro nutrisi seperti protein, karbohidrat, dan lemak.
+Aplikasi menampilkan ringkasan nutrisi yang meliputi:
+- BMR (Basal Metabolic Rate)
+- TDEE (Total Daily Energy Expenditure)
+- Target kalori harian
+- Distribusi makro nutrisi (protein, karbohidrat, lemak) dalam bentuk persentase dan grafik
 
 ### Allergy-Aware Meal Planning
+NutriMatch mempertimbangkan alergi makanan yang dipilih pengguna. Seluruh rekomendasi meal plan difilter secara ketat sehingga makanan yang mengandung alergen pengguna tidak akan ditampilkan.
 
-NutriMatch mempertimbangkan alergi makanan yang dipilih pengguna. Meal plan ditampilkan dengan konteks keamanan alergi agar pengguna lebih mudah memahami apakah makanan tersebut sesuai dengan kondisi mereka.
+### 7-Day AI Meal Plan
+Aplikasi menghasilkan rekomendasi makanan selama 7 hari melalui AI. Setiap hari memiliki pembagian berdasarkan waktu makan: Breakfast, Lunch, Dinner, dan Snack. Pengguna dapat melihat total kalori per hari serta detail nutrisi per makanan.
 
-### 7-Day Meal Plan
+### Meal Detail dan AI Insight
+Setiap makanan yang direkomendasikan dilengkapi dengan:
+- Informasi kalori, protein, karbohidrat, dan lemak
+- Daftar bahan makanan (ingredients)
+- Analisis keamanan alergi
+- Alasan dari AI mengapa makanan tersebut cocok dengan profil pengguna
 
-Aplikasi menyediakan tampilan rekomendasi makanan selama tujuh hari. Setiap hari memiliki beberapa meal option, seperti breakfast, lunch, dinner, dan snack.
+### Halal Filter
+Pengguna dapat mengaktifkan filter halal saat generate meal plan untuk memastikan rekomendasi sesuai preferensi.
 
-### Meal Detail
+## Alur Pengguna
 
-Setiap makanan memiliki detail berupa:
-
-- Nama makanan.
-- Jenis makanan.
-- Kalori.
-- Protein, karbohidrat, dan lemak.
-- Daftar bahan makanan.
-- Analisis alergi.
-- Alasan mengapa makanan tersebut sesuai dengan profil pengguna.
-
-### AI Nutrition Insight
-
-Dashboard menampilkan insight nutrisi dari profil tersimpan, seperti target kalori, BMR, TDEE, dan jumlah filter alergi aktif agar rekomendasi lebih mudah dipahami pengguna.
+1. Pengguna mengakses landing page dan melihat informasi singkat mengenai NutriMatch.
+2. Pengguna melakukan registrasi akun baru atau login dengan akun yang sudah ada (termasuk opsi Google OAuth).
+3. Pengguna mengisi onboarding profile yang terdiri dari 4 tahap: data personal, body profile, nutrition goal, dan pemilihan alergi.
+4. Aplikasi menampilkan dashboard berisi ringkasan kebutuhan nutrisi, distribusi makro, status alergi, dan preview rekomendasi.
+5. Pengguna membuka halaman Meal Plan dan melakukan generate untuk mendapatkan rekomendasi 7 hari.
+6. Pengguna dapat menelusuri detail setiap makanan untuk melihat informasi nutrisi lengkap dan analisis alergi.
+7. Pengguna dapat mengubah data profil dan preferensi rekomendasi kapan saja melalui halaman Profile.
 
 ## Halaman Aplikasi
 
-- Landing page: memperkenalkan NutriMatch dan manfaat utamanya.
-- Login page: halaman masuk pengguna.
-- Register page: halaman pembuatan akun.
-- Onboarding page: halaman pengisian profil awal.
-- Dashboard page: ringkasan nutrisi dan status alergi.
-- Meal plan page: rekomendasi meal plan mingguan.
-- Profile page: halaman untuk melihat dan mengubah data pengguna.
+| Halaman | Deskripsi |
+|---|---|
+| Landing Page | Memperkenalkan NutriMatch, fitur utama, dan alur penggunaan |
+| Login | Halaman masuk pengguna dengan email/password atau Google OAuth |
+| Register | Halaman pembuatan akun baru |
+| Onboarding | Proses pengisian profil awal (4 tahap: Personal, Body, Goal, Allergies) |
+| Dashboard | Ringkasan nutrisi, distribusi makro, status alergi, dan preview rekomendasi |
+| Meal Plan | Rekomendasi meal plan mingguan dengan pembagian per waktu makan |
+| Profile | Halaman untuk melihat dan mengubah data profil serta preferensi rekomendasi |
+
+## Tech Stack
+
+| Kategori | Teknologi |
+|---|---|
+| Framework | Next.js (App Router) |
+| Bahasa | TypeScript |
+| Styling | Tailwind CSS |
+| Database | PostgreSQL (via Supabase) |
+| ORM | Prisma |
+| Autentikasi | Supabase Auth (email/password, Google OAuth) |
+| AI/ML | Model Machine Learning untuk rekomendasi makanan |
+| Deployment | Vercel |
+
+## Petunjuk Setup Environment
+
+Untuk menyiapkan lingkungan kerja di lokal, ikuti langkah-langkah berikut:
+
+### Prasyarat
+- Node.js versi 18.x atau lebih baru
+- npm (sudah termasuk dalam instalasi Node.js)
+- Akun Supabase untuk konfigurasi database dan autentikasi
+
+### Langkah Instalasi
+
+1. Clone repository:
+   ```bash
+   git clone <url-repository>
+   cd NutriMatch
+   ```
+
+2. Buat file `.env` di root proyek dan isi dengan environment variables yang dibutuhkan:
+   ```
+   DATABASE_URL=<url-database-postgresql>
+   DIRECT_URL=<url-direct-database>
+   NEXT_PUBLIC_SUPABASE_URL=<url-supabase>
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key-supabase>
+   ```
+
+3. Instal semua dependensi:
+   ```bash
+   npm install
+   ```
+
+4. Generate Prisma client dan sinkronkan skema database:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+
+## Cara Menjalankan Aplikasi
+
+Setelah setup environment selesai, jalankan development server:
+
+```bash
+npm run dev
+```
+
+Buka browser dan akses `http://localhost:3000` untuk menggunakan aplikasi.
+
+Untuk build production:
+
+```bash
+npm run build
+npm start
+```

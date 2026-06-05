@@ -11,7 +11,14 @@ import { GoalCard } from "@/components/profile/GoalCard";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import type { ActivityLevel, Allergy, AllergyId, DietGoal, Gender, UserProfile } from "@/types";
+import type {
+  ActivityLevel,
+  Allergy,
+  AllergyId,
+  DietGoal,
+  Gender,
+  UserProfile,
+} from "@/types";
 
 const steps = ["Personal", "Body", "Goal", "Allergies"];
 const activityLevels: ActivityLevel[] = [
@@ -182,9 +189,7 @@ export function OnboardingPageContent() {
             activityLevel:
               activityFromApi[savedProfile.activityLevel] ?? "Light",
             dietGoal: goalFromApi[savedProfile.healthGoal] ?? "Maintain weight",
-            allergies: savedProfile.allergies.map(
-              (item) => item.allergen.id,
-            ),
+            allergies: savedProfile.allergies.map((item) => item.allergen.id),
           });
         }
       } catch (caughtError) {
@@ -252,7 +257,9 @@ export function OnboardingPageContent() {
       router.push("/dashboard");
       router.refresh();
     } catch {
-      setError("Tidak bisa menghubungi server. Coba jalankan ulang aplikasinya.");
+      setError(
+        "Tidak bisa menghubungi server. Coba jalankan ulang aplikasinya.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -290,9 +297,7 @@ export function OnboardingPageContent() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-semibold text-brand-700">
-                Onboarding
-              </p>
+              <p className="text-sm font-semibold text-brand-700">Onboarding</p>
               <h1 className="mt-2 text-3xl font-bold tracking-normal text-ink">
                 Build your nutrition profile
               </h1>
@@ -439,8 +444,8 @@ export function OnboardingPageContent() {
                     Allergy Selection
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-                    Select any allergies you want NutriMatch to avoid. If you
-                    do not have allergies, you can leave this section empty.
+                    Select any allergies you want NutriMatch to avoid. If you do
+                    not have allergies, you can leave this section empty.
                   </p>
                   <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                     {allergies.map((allergy) => (

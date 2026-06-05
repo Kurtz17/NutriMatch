@@ -1,14 +1,10 @@
 import { MealType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
-// =============================================================================
-// TIPE DATA
-// =============================================================================
-
 export interface MealSlot {
   mealType: MealType;
-  targetCalories: number;  
-  categories: string[]; 
+  targetCalories: number;
+  categories: string[];
 }
 
 export interface GeneratedMealItem {
@@ -22,11 +18,6 @@ export interface GeneratedMealItem {
   carbsG: number;
   fatG: number;
 }
-
-// =============================================================================
-// DISTRIBUSI KALORI PER SESI MAKAN
-// Breakfast 25% | Lunch 35% | Dinner 30% | Snack 10%
-// =============================================================================
 
 export function getMealSlots(dailyTargetCalories: number): MealSlot[] {
   return [
@@ -42,39 +33,29 @@ export function getMealSlots(dailyTargetCalories: number): MealSlot[] {
     },
     {
       mealType: "DINNER",
-      targetCalories: Math.round(dailyTargetCalories * 0.30),
+      targetCalories: Math.round(dailyTargetCalories * 0.3),
       categories: ["Karbohidrat", "Protein", "Sayuran", "Makanan Khas"],
     },
     {
       mealType: "SNACK",
-      targetCalories: Math.round(dailyTargetCalories * 0.10),
+      targetCalories: Math.round(dailyTargetCalories * 0.1),
       categories: ["Buah", "Minuman"],
     },
   ];
 }
 
-// =============================================================================
-// HITUNG PORSI (GRAM) BERDASARKAN TARGET KALORI
-// Rumus: servingG = (targetCalories / caloriesPer100g) * 100
-// Dibatasi antara 80g - 400g agar porsi tetap realistis
-// =============================================================================
-
 export function calculateServing(
   targetCalories: number,
-  caloriesPer100g: number
+  caloriesPer100g: number,
 ): number {
   const rawServing = (targetCalories / caloriesPer100g) * 100;
   const clamped = Math.min(Math.max(rawServing, 80), 400);
   return Math.round(clamped);
 }
 
-// =============================================================================
-// HITUNG NUTRISI BERDASARKAN PORSI AKTUAL
-// =============================================================================
-
 export function calculateNutritionByServing(
   servingG: number,
-  per100g: { calories: number; protein: number; carbs: number; fat: number }
+  per100g: { calories: number; protein: number; carbs: number; fat: number },
 ) {
   const ratio = servingG / 100;
   return {
@@ -85,17 +66,12 @@ export function calculateNutritionByServing(
   };
 }
 
-// =============================================================================
-// GENERATOR UTAMA — Generate meal plan 7 hari
-// =============================================================================
-
 export async function generateMealPlan(
   userId: string,
   targetCalories: number,
   allergenIds: string[],
   days = 7,
 ): Promise<GeneratedMealItem[]> {
-
   const safeFoods = await prisma.food.findMany({
     where:
       allergenIds.length > 0
@@ -116,7 +92,7 @@ export async function generateMealPlan(
 
   if (safeFoods.length < 5) {
     throw new Error(
-      "Tidak cukup makanan yang aman untuk membuat meal plan. Coba kurangi filter alergi."
+      "Tidak cukup makanan yang aman untuk membuat meal plan. Coba kurangi filter alergi.",
     );
   }
 
@@ -134,7 +110,9 @@ export async function generateMealPlan(
     for (const slot of mealSlots) {
       const candidates = slot.categories
         .flatMap((cat) => foodsByCategory[cat] ?? [])
-        .filter((food, idx, arr) => arr.findIndex((f) => f.id === food.id) === idx);
+        .filter(
+          (food, idx, arr) => arr.findIndex((f) => f.id === food.id) === idx,
+        );
 
       if (candidates.length === 0) continue;
 
@@ -143,7 +121,7 @@ export async function generateMealPlan(
 
       const servingG = calculateServing(
         slot.targetCalories,
-        selectedFood.caloriesPer100g
+        selectedFood.caloriesPer100g,
       );
 
       const nutrition = calculateNutritionByServing(servingG, {

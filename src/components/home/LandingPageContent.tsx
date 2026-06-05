@@ -21,10 +21,6 @@ import { HeroDashboardPreview } from "@/components/home/HeroDashboardPreview";
 import { DashboardPreviewSection } from "@/components/home/DashboardPreviewSection";
 import { buttonStyles } from "@/components/ui/Button";
 
-/* ------------------------------------------------------------------ */
-/*  Static data                                                        */
-/* ------------------------------------------------------------------ */
-
 const trustBadges = [
   { icon: ShieldCheck, label: "Allergy-aware" },
   { icon: Target, label: "Profile-based" },
@@ -71,32 +67,38 @@ const features = [
   {
     icon: ClipboardList,
     title: "Guided Profile Setup",
-    description: "Collect body metrics, activity level, diet goal, and allergy filters in one focused flow.",
+    description:
+      "Collect body metrics, activity level, diet goal, and allergy filters in one focused flow.",
   },
   {
     icon: Calculator,
     title: "BMR, TDEE & Targets",
-    description: "Turn profile data into clear daily energy targets that drive every recommendation.",
+    description:
+      "Turn profile data into clear daily energy targets that drive every recommendation.",
   },
   {
     icon: ShieldCheck,
     title: "Allergy-Aware Filtering",
-    description: "Exclude foods connected to selected allergens before building the weekly plan.",
+    description:
+      "Exclude foods connected to selected allergens before building the weekly plan.",
   },
   {
     icon: CalendarDays,
     title: "7-Day Meal Plan",
-    description: "Generate breakfast, lunch, dinner, and snack options from your saved profile data.",
+    description:
+      "Generate breakfast, lunch, dinner, and snack options from your saved profile data.",
   },
   {
     icon: Sparkles,
     title: "Readable Nutrition",
-    description: "Show why targets and recommendations fit the user's profile without the noise.",
+    description:
+      "Show why targets and recommendations fit the user's profile without the noise.",
   },
   {
     icon: ChartPie,
     title: "Plan Review Dashboard",
-    description: "Review targets, allergies, meal previews, and nutrition summaries in one clean dashboard.",
+    description:
+      "Review targets, allergies, meal previews, and nutrition summaries in one clean dashboard.",
   },
 ];
 
@@ -110,7 +112,8 @@ const workflow = [
   {
     number: "2",
     title: "Save Your Profile",
-    description: "Fill in body metrics, activity, goals, and allergy preferences.",
+    description:
+      "Fill in body metrics, activity, goals, and allergy preferences.",
     color: "bg-brand-500",
   },
   {
@@ -121,25 +124,16 @@ const workflow = [
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Component                                                          */
-/* ------------------------------------------------------------------ */
-
 export function LandingPageContent() {
   return (
     <div className="bg-white">
       <Navbar />
 
-      {/* ============================================================= */}
-      {/* HERO                                                           */}
-      {/* ============================================================= */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50 pt-12 pb-16 sm:pt-20 sm:pb-24">
-        {/* Decorative blobs */}
         <div className="hero-gradient-blob -top-32 -left-32 h-96 w-96 bg-emerald-400" />
         <div className="hero-gradient-blob -right-20 top-20 h-72 w-72 bg-sky-300" />
 
         <div className="app-container relative z-10 grid items-center gap-10 lg:grid-cols-2">
-          {/* Left */}
           <div className="animate-fade-in-up max-w-xl">
             <h1 className="text-4xl font-bold leading-[1.15] tracking-tight text-ink sm:text-5xl">
               Safer Meal Plans{" "}
@@ -163,19 +157,14 @@ export function LandingPageContent() {
                 View Dashboard
               </Link>
             </div>
-
           </div>
 
-          {/* Right — Dashboard preview card */}
           <div className="animate-fade-in-up animate-delay-200 hidden md:block">
             <HeroDashboardPreview />
           </div>
         </div>
       </section>
 
-      {/* ============================================================= */}
-      {/* STAT CARDS BAR                                                 */}
-      {/* ============================================================= */}
       <section className="relative z-10 -mt-8">
         <div className="app-container">
           <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft sm:grid-cols-2 lg:grid-cols-4">
@@ -205,9 +194,6 @@ export function LandingPageContent() {
         </div>
       </section>
 
-      {/* ============================================================= */}
-      {/* POWERFUL FEATURES                                              */}
-      {/* ============================================================= */}
       <section id="features" className="py-16 sm:py-20">
         <div className="app-container">
           <div className="mx-auto max-w-2xl text-center">
@@ -218,8 +204,8 @@ export function LandingPageContent() {
               Everything you need for safe, personalized nutrition
             </h2>
             <p className="mt-4 text-base leading-7 text-muted">
-              From profile setup to weekly plans, NutriMatch makes healthy eating
-              simple, safe, and tailored to you.
+              From profile setup to weekly plans, NutriMatch makes healthy
+              eating simple, safe, and tailored to you.
             </p>
           </div>
 
@@ -244,9 +230,6 @@ export function LandingPageContent() {
         </div>
       </section>
 
-      {/* ============================================================= */}
-      {/* HOW IT WORKS                                                   */}
-      {/* ============================================================= */}
       <section className="bg-slate-50 py-16 sm:py-20">
         <div className="app-container">
           <div className="mx-auto max-w-2xl text-center">
@@ -283,16 +266,8 @@ export function LandingPageContent() {
         </div>
       </section>
 
-      {/* ============================================================= */}
-      {/* DASHBOARD PREVIEW (functional cards)                           */}
-      {/* ============================================================= */}
       <DashboardPreviewSection />
 
-
-
-      {/* ============================================================= */}
-      {/* FOOTER                                                         */}
-      {/* ============================================================= */}
       <footer className="bg-slate-950 py-16 lg:py-20">
         <div className="app-container grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
@@ -310,7 +285,7 @@ export function LandingPageContent() {
               NutriMatch connects your personal profile and allergy preferences
               to generate safe, personalized weekly meal plans you can trust.
             </p>
-            {/* Social icons */}
+
             <div className="mt-5 flex gap-3">
               {[Globe, Mail, MessageCircle, Heart].map((Icon, i) => (
                 <a
@@ -326,19 +301,63 @@ export function LandingPageContent() {
           <div>
             <p className="font-semibold text-white">Product</p>
             <ul className="mt-5 space-y-3 text-sm text-slate-400">
-              <li><Link href="/meal-plan" className="transition hover:text-emerald-400">Meal Plan</Link></li>
-              <li><Link href="/dashboard" className="transition hover:text-emerald-400">Dashboard</Link></li>
-              <li><Link href="/profile" className="transition hover:text-emerald-400">Profile Setup</Link></li>
-              <li><Link href="#features" className="transition hover:text-emerald-400">Features</Link></li>
+              <li>
+                <Link
+                  href="/meal-plan"
+                  className="transition hover:text-emerald-400"
+                >
+                  Meal Plan
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/dashboard"
+                  className="transition hover:text-emerald-400"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/profile"
+                  className="transition hover:text-emerald-400"
+                >
+                  Profile Setup
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#features"
+                  className="transition hover:text-emerald-400"
+                >
+                  Features
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <p className="font-semibold text-white">Company</p>
             <ul className="mt-5 space-y-3 text-sm text-slate-400">
-              <li><Link href="#" className="transition hover:text-emerald-400">About Us</Link></li>
-              <li><Link href="#" className="transition hover:text-emerald-400">Privacy Policy</Link></li>
-              <li><Link href="#" className="transition hover:text-emerald-400">Terms of Service</Link></li>
-              <li><Link href="#" className="transition hover:text-emerald-400">Contact</Link></li>
+              <li>
+                <Link href="#" className="transition hover:text-emerald-400">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="transition hover:text-emerald-400">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="transition hover:text-emerald-400">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="transition hover:text-emerald-400">
+                  Contact
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

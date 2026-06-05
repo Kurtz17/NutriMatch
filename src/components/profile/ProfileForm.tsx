@@ -2,7 +2,14 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { Save, UserRound } from "lucide-react";
-import type { ActivityLevel, Allergy, AllergyId, DietGoal, Gender, UserProfile } from "@/types";
+import type {
+  ActivityLevel,
+  Allergy,
+  AllergyId,
+  DietGoal,
+  Gender,
+  UserProfile,
+} from "@/types";
 import { ActivityCard } from "@/components/profile/ActivityCard";
 import { AllergyCard } from "@/components/profile/AllergyCard";
 import { GoalCard } from "@/components/profile/GoalCard";
@@ -140,7 +147,10 @@ function toAllergy(allergen: ApiAllergen): Allergy {
   };
 }
 
-function getSelectedAllergyTexts(allergies: Allergy[], selectedIds: AllergyId[]) {
+function getSelectedAllergyTexts(
+  allergies: Allergy[],
+  selectedIds: AllergyId[],
+) {
   return allergies
     .filter((allergy) => selectedIds.includes(allergy.id))
     .map((allergy) => `${allergy.slug ?? ""} ${allergy.label}`);
@@ -312,7 +322,11 @@ export function ProfileForm() {
     setStatus("");
     setError("");
 
-    if (profile.age === "" || profile.weightKg === "" || profile.heightCm === "") {
+    if (
+      profile.age === "" ||
+      profile.weightKg === "" ||
+      profile.heightCm === ""
+    ) {
       setError("Age, height, dan weight wajib diisi.");
       return;
     }
@@ -324,21 +338,23 @@ export function ProfileForm() {
 
       if (photoFile) {
         const supabase = createClient();
-        const fileExt = photoFile.name.split('.').pop();
+        const fileExt = photoFile.name.split(".").pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const filePath = `${profile.email}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('avatars')
+          .from("avatars")
           .upload(filePath, photoFile, { upsert: true });
 
         if (uploadError) {
-          throw new Error("Gagal mengunggah foto. Pastikan Anda telah membuat bucket 'avatars' dengan akses Public di Supabase.");
+          throw new Error(
+            "Gagal mengunggah foto. Pastikan Anda telah membuat bucket 'avatars' dengan akses Public di Supabase.",
+          );
         }
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(filePath);
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("avatars").getPublicUrl(filePath);
 
         finalPhotoUrl = publicUrl;
       }
@@ -384,15 +400,14 @@ export function ProfileForm() {
         JSON.stringify(payloadToSave),
       );
       setRecommendationPayload(payloadToSave);
-      
+
       if (photoFile) {
-        setProfile(current => ({ ...current, photoUrl: finalPhotoUrl }));
+        setProfile((current) => ({ ...current, photoUrl: finalPhotoUrl }));
         setPhotoFile(null);
       }
-      
+
       setStatus("Profil berhasil disimpan.");
 
-      // If photo was changed, reload the page after a short delay to sync the Navbar avatar
       if (photoFile) {
         setTimeout(() => {
           window.location.reload();
@@ -402,7 +417,9 @@ export function ProfileForm() {
       if (caughtError instanceof Error) {
         setError(caughtError.message);
       } else {
-        setError("Tidak bisa menghubungi server. Coba jalankan ulang aplikasinya.");
+        setError(
+          "Tidak bisa menghubungi server. Coba jalankan ulang aplikasinya.",
+        );
       }
     } finally {
       setIsSaving(false);
@@ -455,18 +472,20 @@ export function ProfileForm() {
             <CardContent>
               <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-brand-700">Profile</p>
+                  <p className="text-sm font-semibold text-brand-700">
+                    Profile
+                  </p>
                   <h2 className="mt-1 text-xl font-bold text-ink">
                     Personal information
                   </h2>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100 border border-slate-200">
-                    {(photoPreview || profile.photoUrl) ? (
-                      <img 
-                        src={photoPreview || profile.photoUrl || ""} 
-                        alt="Preview" 
+                    {photoPreview || profile.photoUrl ? (
+                      <img
+                        src={photoPreview || profile.photoUrl || ""}
+                        alt="Preview"
                         className="h-full w-full object-cover"
                       />
                     ) : (

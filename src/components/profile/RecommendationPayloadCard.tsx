@@ -107,8 +107,6 @@ function MultiSelectDropdown({
           })}
         </div>
       ) : null}
-
-
     </div>
   );
 }

@@ -9,7 +9,10 @@ import {
 import type { ActivityLevel } from "@/types";
 import { cn } from "@/lib/utils";
 
-const activityMeta: Record<ActivityLevel, { icon: LucideIcon; helper: string }> = {
+const activityMeta: Record<
+  ActivityLevel,
+  { icon: LucideIcon; helper: string }
+> = {
   Sedentary: {
     icon: Monitor,
     helper: "Desk work and little planned exercise.",
