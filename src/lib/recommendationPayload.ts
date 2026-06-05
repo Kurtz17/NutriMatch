@@ -95,14 +95,14 @@ export const lunchDinnerIngredientOptions = [
 ];
 
 export const categoryToIngredientsMap: Record<string, string[]> = {
-  berkuah: ["other"],
-  buah: ["buah", "susu"],
-  gorengan: ["terigu"],
-  karbohidrat_pokok: ["ayam", "beras", "terigu"],
-  lauk_hewani: ["ikan", "other"],
-  minuman_susu: ["susu"],
-  sayuran: ["sayuran"],
-  snack_dessert: ["susu"],
+  berkuah: ["ayam", "ikan", "sayuran", "other"],
+  buah: ["buah", "susu", "other"],
+  gorengan: ["ayam", "sayuran", "terigu", "other"],
+  karbohidrat_pokok: ["beras", "terigu", "other"],
+  lauk_hewani: ["ayam", "ikan", "other"],
+  minuman_susu: ["susu", "other"],
+  sayuran: ["sayuran", "other"],
+  snack_dessert: ["buah", "susu", "terigu", "other"],
 };
 
 export function localIsoDate() {
