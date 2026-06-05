@@ -107,7 +107,9 @@ export const categoryToIngredientsMap: Record<string, string[]> = {
 
 export function localIsoDate() {
   const date = new Date();
-  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  const offsetDate = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000,
+  );
   return offsetDate.toISOString().split("T")[0];
 }
 
@@ -127,30 +129,34 @@ export function calculateTargetCalories(
   weightKg: number,
   heightCm: number,
   gender: "Female" | "Male" | "Prefer not to say" | string,
-  activityLevel: "Sedentary" | "Light" | "Moderate" | "Active" | "Very Active" | string,
-  dietGoal: "Lose weight" | "Maintain weight" | "Gain weight" | string
+  activityLevel:
+    | "Sedentary"
+    | "Light"
+    | "Moderate"
+    | "Active"
+    | "Very Active"
+    | string,
+  dietGoal: "Lose weight" | "Maintain weight" | "Gain weight" | string,
 ): number {
   if (!age || !weightKg || !heightCm) return 1800;
-  
-  // BMR Calculation (Mifflin-St Jeor)
+
   const isMale = gender === "Male";
   const bmr = isMale
     ? 10 * weightKg + 6.25 * heightCm - 5 * age + 5
     : 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
 
-  // Activity Multiplier
-  let multiplier = 1.2; // Sedentary
+  let multiplier = 1.2;
   if (activityLevel === "Light") multiplier = 1.375;
   else if (activityLevel === "Moderate") multiplier = 1.55;
-  else if (activityLevel === "Very Active" || activityLevel === "Active") multiplier = 1.725;
+  else if (activityLevel === "Very Active" || activityLevel === "Active")
+    multiplier = 1.725;
 
   let tdee = bmr * multiplier;
 
-  // Diet Goal Adjustment
   if (dietGoal === "Lose weight") tdee -= 500;
   else if (dietGoal === "Gain weight") tdee += 500;
 
-  return Math.max(Math.round(tdee), 1200); // Minimum 1200 calories
+  return Math.max(Math.round(tdee), 1200);
 }
 
 export function emptyAllergyFlags(): Record<AllergyKey, 0 | 1> {
@@ -185,8 +191,7 @@ export function allergyFlagsFromText(values: string[]) {
 
     if (text.includes("gluten") || text.includes("wheat")) flags.gluten = 1;
     if (text.includes("dairy") || text.includes("susu")) flags.dairy = 1;
-    
-    // Separate peanut and tree nuts
+
     if (text.includes("peanut") || text.includes("kacang tanah")) {
       flags.peanut = 1;
     } else if (text.includes("nut") || text.includes("kacang")) {
@@ -258,7 +263,10 @@ function normalizeStringList(value: unknown) {
   return [];
 }
 
-function filterDatasetValues(values: string[], options: Array<{ value: string }>) {
+function filterDatasetValues(
+  values: string[],
+  options: Array<{ value: string }>,
+) {
   const allowedValues = new Set(options.map((option) => option.value));
   return values.filter((value) => allowedValues.has(value));
 }
@@ -273,7 +281,9 @@ export function parseStoredRecommendationPayload(raw: string | null) {
 
     for (const option of allergyOptions) {
       allergies[option.key] =
-        parsed.allergies?.[option.key] === 1 ? 1 : defaults.allergies[option.key];
+        parsed.allergies?.[option.key] === 1
+          ? 1
+          : defaults.allergies[option.key];
     }
 
     return {
@@ -286,7 +296,10 @@ export function parseStoredRecommendationPayload(raw: string | null) {
           Math.round(toNumber(parsed.target_macros?.protein_g, 100)),
           1,
         ),
-        fat_g: Math.max(Math.round(toNumber(parsed.target_macros?.fat_g, 50)), 1),
+        fat_g: Math.max(
+          Math.round(toNumber(parsed.target_macros?.fat_g, 50)),
+          1,
+        ),
         carb_g: Math.max(
           Math.round(toNumber(parsed.target_macros?.carb_g, 200)),
           1,

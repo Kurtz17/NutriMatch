@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, Lightbulb, TrendingUp, Utensils } from "lucide-react";
+import {
+  ArrowRight,
+  Sparkles,
+  Lightbulb,
+  TrendingUp,
+  Utensils,
+} from "lucide-react";
 import type { AIInsight } from "@/types";
 import { Card, CardContent } from "@/components/ui/Card";
 import { buttonStyles } from "@/components/ui/Button";
@@ -49,7 +55,6 @@ export function AIInsightCard({ insight }: { insight: AIInsight }) {
           ))}
         </div>
 
-        {/* Nutrition tips */}
         <div className="mt-6 flex-1 space-y-3 rounded-lg border border-brand-100 bg-white/60 p-4">
           <p className="text-xs font-bold uppercase tracking-wider text-brand-700">
             Quick Tips
@@ -61,7 +66,9 @@ export function AIInsightCard({ insight }: { insight: AIInsight }) {
               </span>
               <div>
                 <p className="text-sm font-semibold text-ink">{tip.title}</p>
-                <p className="mt-0.5 text-xs leading-5 text-muted">{tip.text}</p>
+                <p className="mt-0.5 text-xs leading-5 text-muted">
+                  {tip.text}
+                </p>
               </div>
             </div>
           ))}

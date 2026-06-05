@@ -8,10 +8,7 @@ export async function POST() {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      return NextResponse.json(
-        { error: "Gagal logout" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Gagal logout" }, { status: 500 });
     }
 
     return NextResponse.json({ message: "Logout berhasil" });
@@ -19,7 +16,7 @@ export async function POST() {
     console.error("Logout error:", error);
     return NextResponse.json(
       { error: "Terjadi kesalahan server" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

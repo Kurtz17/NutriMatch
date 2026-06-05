@@ -74,17 +74,15 @@ async function saveAiMealPlan({
   const startDate = toPlanStartDate(requestBody.start_date);
   const endDate = toPlanEndDate(startDate, requestBody.days);
 
-  // Step 1: collect all unique food names from the AI result
   const allRecommendations = result.dailyPlan.flatMap((meal, mealIndex) =>
     meal.recommendations.map((rec) => ({
       rec,
       mealType: normalizeMealType(meal.mealName),
       dayNumber: normalizeDayNumber(meal.mealName, mealIndex, requestBody.days),
-    }))
+    })),
   );
 
-  // Step 2: upsert all foods in parallel OUTSIDE the transaction (avoids pgbouncer sequential-await issues)
-  const foodMap = new Map<string, string>(); // foodName → foodId
+  const foodMap = new Map<string, string>();
   await Promise.all(
     allRecommendations.map(async ({ rec }) => {
       const caloriesPer100g = rec.calories100g ?? 0;
@@ -107,13 +105,16 @@ async function saveAiMealPlan({
         });
         foodMap.set(rec.foodName, food.id);
       } catch (e) {
-        console.error("[saveAiMealPlan] food upsert failed for:", rec.foodName, e);
+        console.error(
+          "[saveAiMealPlan] food upsert failed for:",
+          rec.foodName,
+          e,
+        );
         throw e;
       }
-    })
+    }),
   );
 
-  // Step 3: create MealPlan + all MealPlanItems in a single efficient transaction
   const savedPlan = await prisma.$transaction(async (tx) => {
     const plan = await tx.mealPlan.create({
       data: {
@@ -148,10 +149,6 @@ async function saveAiMealPlan({
   return { savedPlan, startDate, endDate };
 }
 
-/**
- * Fallback: retry AI with a simplified no-prefs request.
- * No local dataset needed — data comes entirely from the AI API.
- */
 async function saveFallbackMealPlan({
   userId,
   requestBody,
@@ -159,9 +156,10 @@ async function saveFallbackMealPlan({
   userId: string;
   requestBody: RecommendRequest;
 }) {
-  // Build a minimal request: same macros/allergies/days, but strip user prefs & text
   const simplifiedRequest: RecommendRequest = {
-    target_macros: buildTargetMacros({ targetCalories: requestBody.target_macros.calories }),
+    target_macros: buildTargetMacros({
+      targetCalories: requestBody.target_macros.calories,
+    }),
     allergies: requestBody.allergies,
     breakfast_prefs: { food_category: [], main_ingredients: [] },
     lunch_prefs: { food_category: [], main_ingredients: [] },
@@ -175,7 +173,6 @@ async function saveFallbackMealPlan({
 
   const aiResult = await requestAiMealRecommendation(simplifiedRequest);
 
-  // Mark source as fallback in the result
   const fallbackResult: NormalizedMealRecommendationResult = {
     ...aiResult,
     source: "fallback",
@@ -197,7 +194,6 @@ async function saveFallbackMealPlan({
 
   return { ...saved, totalFoodsGenerated };
 }
-
 
 export async function GET() {
   try {
@@ -238,8 +234,14 @@ export async function GET() {
         (item) => item.dayNumber === dayNumber,
       );
 
-      const totalCalories = dayItems.reduce((sum, item) => sum + item.calories, 0);
-      const totalProteinG = dayItems.reduce((sum, item) => sum + item.proteinG, 0);
+      const totalCalories = dayItems.reduce(
+        (sum, item) => sum + item.calories,
+        0,
+      );
+      const totalProteinG = dayItems.reduce(
+        (sum, item) => sum + item.proteinG,
+        0,
+      );
       const totalCarbsG = dayItems.reduce((sum, item) => sum + item.carbsG, 0);
       const totalFatG = dayItems.reduce((sum, item) => sum + item.fatG, 0);
 
@@ -306,7 +308,8 @@ export async function POST(request: NextRequest) {
     if (!profile || !profile.targetCalories) {
       return NextResponse.json(
         {
-          error: "Profil belum lengkap. Silakan isi data fisik terlebih dahulu.",
+          error:
+            "Profil belum lengkap. Silakan isi data fisik terlebih dahulu.",
         },
         { status: 400 },
       );
@@ -326,8 +329,9 @@ export async function POST(request: NextRequest) {
     let source: "ai" | "fallback" = "ai";
     let warning: string | undefined;
 
-    // Step 1: call AI — only AI errors are handled here
-    let aiResult: Awaited<ReturnType<typeof requestAiMealRecommendation>> | null = null;
+    let aiResult: Awaited<
+      ReturnType<typeof requestAiMealRecommendation>
+    > | null = null;
     try {
       aiResult = await requestAiMealRecommendation(requestBody);
     } catch (aiError) {
@@ -359,11 +363,10 @@ export async function POST(request: NextRequest) {
       warning = isEmptyRecommendationError(aiError)
         ? "AI returned an empty recommendation, so local fallback was used."
         : aiError instanceof Error
-        ? aiError.message
-        : "AI recommendation failed. Local fallback was used.";
+          ? aiError.message
+          : "AI recommendation failed. Local fallback was used.";
     }
 
-    // Step 2: if AI succeeded, save to DB (DB errors bubble up to outer catch → 500)
     if (aiResult !== null) {
       const { savedPlan, startDate, endDate } = await saveAiMealPlan({
         userId: user.id,
@@ -400,7 +403,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "Meal plan dibuat menggunakan AI fallback (simplified request).",
+        message:
+          "Meal plan dibuat menggunakan AI fallback (simplified request).",
         source,
         warning,
         mealPlanId: fallback.savedPlan.id,

@@ -1,5 +1,15 @@
 import type { LucideIcon } from "lucide-react";
-import { Bean, Egg, Fish, Leaf, Milk, Nut, Shell, ShieldCheck, Wheat } from "lucide-react";
+import {
+  Bean,
+  Egg,
+  Fish,
+  Leaf,
+  Milk,
+  Nut,
+  Shell,
+  ShieldCheck,
+  Wheat,
+} from "lucide-react";
 import type { Allergy, AllergyId } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +52,9 @@ export function AllergyCard({
         <span
           className={cn(
             "inline-flex h-11 w-11 items-center justify-center rounded-lg",
-            selected ? "bg-white text-brand-700" : "bg-slate-100 text-slate-600",
+            selected
+              ? "bg-white text-brand-700"
+              : "bg-slate-100 text-slate-600",
           )}
         >
           <Icon className="h-5 w-5" />

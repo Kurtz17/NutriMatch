@@ -18,7 +18,6 @@ export async function GET() {
     const metadataName = user.user_metadata?.name as string | undefined;
     const metadataPhoto = user.user_metadata?.avatar_url as string | undefined;
 
-    // Sync ID if email matches but ID differs
     const existingUserByEmail = await prisma.user.findUnique({
       where: { email },
       select: { id: true },
@@ -58,7 +57,7 @@ export async function GET() {
     console.error("GET /api/auth/me error:", error);
     return NextResponse.json(
       { error: "Terjadi kesalahan server" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

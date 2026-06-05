@@ -15,16 +15,16 @@ export function MealCard({
   const stats =
     meal.matchScore == null
       ? [
-        ["Cal", meal.calories],
-        ["Protein", `${meal.protein}g`],
-        ["Carbs", `${meal.carbs}g`],
-        ["Fat", `${meal.fat}g`],
-      ]
+          ["Cal", meal.calories],
+          ["Protein", `${meal.protein}g`],
+          ["Carbs", `${meal.carbs}g`],
+          ["Fat", `${meal.fat}g`],
+        ]
       : [
-        ["Cal", meal.calories],
-        ["Grams", `${meal.idealGrams ?? 0}g`],
-        ["/100g", meal.calories100g ?? 0],
-      ];
+          ["Cal", meal.calories],
+          ["Grams", `${meal.idealGrams ?? 0}g`],
+          ["/100g", meal.calories100g ?? 0],
+        ];
 
   const stripLabel = (text: string) => text.replace(/^\[.*?\]\s*/, "");
 
@@ -56,7 +56,9 @@ export function MealCard({
         </div>
 
         <div className="mt-auto">
-          <div className={`mt-5 grid gap-2 text-center ${stats.length === 3 ? "grid-cols-3" : "grid-cols-4"}`}>
+          <div
+            className={`mt-5 grid gap-2 text-center ${stats.length === 3 ? "grid-cols-3" : "grid-cols-4"}`}
+          >
             {stats.map(([label, value]) => (
               <div key={label} className="rounded-lg bg-slate-50 px-2 py-3">
                 <p className="text-xs font-semibold text-muted">{label}</p>
@@ -64,8 +66,6 @@ export function MealCard({
               </div>
             ))}
           </div>
-
-
 
           {onOpen ? (
             <Button

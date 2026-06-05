@@ -1,25 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
-import { calculateServing, calculateNutritionByServing } from "@/lib/mealPlanGenerator";
-
-// =============================================================================
-// PATCH /api/meal-plan/item/[itemId]
-//
-// Tukar satu item makanan spesifik dengan alternatif yang:
-//   1. Aman dari alergen user
-//   2. Kategori sama atau serupa
-//   3. Kalori setara (toleransi ±30%)
-//   4. Bukan makanan yang sama dengan yang sedang di-swap
-// =============================================================================
+import {
+  calculateServing,
+  calculateNutritionByServing,
+} from "@/lib/mealPlanGenerator";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ itemId: string }> }
+  { params }: { params: Promise<{ itemId: string }> },
 ) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -38,15 +34,12 @@ export async function PATCH(
     if (!currentItem) {
       return NextResponse.json(
         { error: "Item tidak ditemukan" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (currentItem.mealPlan.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Akses ditolak" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Akses ditolak" }, { status: 403 });
     }
 
     const profile = await prisma.userProfile.findUnique({
@@ -57,7 +50,7 @@ export async function PATCH(
     const allergenIds = profile?.allergies.map((a) => a.allergenId) ?? [];
 
     const currentCalories = currentItem.calories;
-    const toleranceLow = currentCalories * 0.7; 
+    const toleranceLow = currentCalories * 0.7;
     const toleranceHigh = currentCalories * 1.3;
 
     const alternatives = await prisma.food.findMany({
@@ -134,14 +127,17 @@ export async function PATCH(
           error:
             "Tidak ada makanan pengganti yang tersedia dengan kalori setara dan aman dari alergi.",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const randomIndex = Math.floor(Math.random() * finalAlternatives.length);
     const chosenFood = finalAlternatives[randomIndex];
 
-    const newServingG = calculateServing(currentCalories, chosenFood.caloriesPer100g);
+    const newServingG = calculateServing(
+      currentCalories,
+      chosenFood.caloriesPer100g,
+    );
     const newNutrition = calculateNutritionByServing(newServingG, {
       calories: chosenFood.caloriesPer100g,
       protein: chosenFood.proteinPer100g,
@@ -191,7 +187,7 @@ export async function PATCH(
     console.error("PATCH /api/meal-plan/item/[itemId] error:", error);
     return NextResponse.json(
       { error: "Terjadi kesalahan server" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
