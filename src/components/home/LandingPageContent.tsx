@@ -163,18 +163,7 @@ export function LandingPageContent() {
                 View Dashboard
               </Link>
             </div>
-            {/* Trust badges */}
-            <div className="mt-8 flex flex-wrap gap-4">
-              {trustBadges.map((badge) => (
-                <div
-                  key={badge.label}
-                  className="flex items-center gap-1.5 text-sm font-medium text-muted"
-                >
-                  <badge.icon className="h-4 w-4 text-brand-500" />
-                  {badge.label}
-                </div>
-              ))}
-            </div>
+
           </div>
 
           {/* Right — Dashboard preview card */}

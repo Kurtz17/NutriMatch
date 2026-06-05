@@ -180,12 +180,28 @@ export async function DashboardPageContent() {
               </div>
               <div className="mt-5">
                 {allergyLabels.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {allergyLabels.map((label) => (
-                      <Badge key={label} variant="safe">
-                        {label}
-                      </Badge>
-                    ))}
+                  <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                        Restricted Categories
+                      </p>
+                      <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                        {allergyLabels.length} Active
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {allergyLabels.map((label) => (
+                        <Badge key={label} variant="safe" className="border-emerald-200 bg-white shadow-sm">
+                          {label}
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="mt-3 flex items-center gap-2 border-t border-emerald-100 pt-3">
+                      <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                      <p className="text-xs text-emerald-700">
+                        AI strictly avoids generating meals with these ingredients.
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50 px-4 py-3">
