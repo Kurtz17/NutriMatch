@@ -110,7 +110,7 @@ Untuk menyiapkan lingkungan kerja di lokal, ikuti langkah-langkah berikut:
 
 1. Clone repository:
    ```bash
-   git clone <url-repository>
+   git clone https://github.com/Kurtz17/NutriMatch
    cd NutriMatch
    ```
 
